@@ -29,13 +29,13 @@ def main():
     histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
     # Select Reference Image
-    reference_img = imageio.imread(os.path.join('data', 'test_images', 'Fig2.tif'))
-    target_img = imageio.imread(os.path.join('data', 'test_images', 'Fig1.tif'))
+    # reference_img = imageio.imread(os.path.join('data', 'test_images', 'Fig2.tif'))
+    # target_img = imageio.imread(os.path.join('data', 'test_images', 'Fig1.tif'))
     
-    histogram_matcher.perform_histogram_matching(target_img, reference_img, display=True)
+    # histogram_matcher.perform_histogram_matching(target_img, reference_img, display=True)
 
     # Perform histogram matching
-    # histogram_matcher.perform_batch_histogram_matching(dataset, dataset[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    histogram_matcher.perform_batch_histogram_matching(dataset, dataset[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ########################################### COMPARE RESULTS ##########################################

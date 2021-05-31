@@ -14,6 +14,7 @@ import numpy as np
 import skimage
 import imageio
 import scipy
+import utils
 import cv2
 import os
 
@@ -76,9 +77,9 @@ class HistogramMatcher:
             # loop over the channels of the image
             for i in range(target_img.shape[0]):
                 image = target_img[i, :, :]
-                target_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
+                target_image_equalized[i, :, :] = utils.histogram_equalization(image)[0]
         else:
-            target_image_equalized = self._histogram_equalization(target_img)[0]
+            target_image_equalized = utils.histogram_equalization(target_img)[0]
 
 
         # Histogram Equalization to the reference image
@@ -87,9 +88,9 @@ class HistogramMatcher:
             # loop over the channels of the image
             for i in range(reference_img.shape[0]):
                 image = reference_img[i, :, :]
-                reference_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
+                reference_image_equalized[i, :, :] = utils.histogram_equalization(image)[0]
         else:
-            reference_image_equalized = self._histogram_equalization(reference_img)[0]
+            reference_image_equalized = utils.histogram_equalization(reference_img)[0]
 
         # # Save the histogram equalized target image
         # imageio.imsave('data/test_images/HEtarget.tif', target_img)
@@ -127,25 +128,25 @@ class HistogramMatcher:
             # Target Image
             subplot = figure3.add_subplot(221)
             if len(target_img.shape) == 3:
-                plt.imshow(np.array(target_img[12,:,:],np.int32))
+                plt.imshow(np.array(target_img[12,:,:],np.int32), cmap='gray')
             else:
-                plt.imshow(np.array(target_img,np.int32))
+                plt.imshow(np.array(target_img,np.int32), cmap='gray')
             subplot.set_title('Target Image')
 
             # Reference Image
             subplot = figure3.add_subplot(222)
             if len(reference_img.shape) == 3:
-                plt.imshow(np.array(reference_img[12,:,:],np.int32))
+                plt.imshow(np.array(reference_img[12,:,:],np.int32), cmap='gray')
             else:
-                plt.imshow(np.array(reference_img,np.int32))
+                plt.imshow(np.array(reference_img,np.int32), cmap='gray')
             subplot.set_title('Reference Image')
             
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(223)
             if len(new_target_img.shape) == 3:
-                plt.imshow(np.array(new_target_img[12,:,:],np.int32))
+                plt.imshow(np.array(new_target_img[12,:,:],np.int32), cmap='gray')
             else:
-                plt.imshow(np.array(new_target_img,np.int32))
+                plt.imshow(np.array(new_target_img,np.int32), cmap='gray')
 
             subplot.set_title('Image Matched to Histogram')
 
@@ -164,95 +165,3 @@ class HistogramMatcher:
             plt.show()
             
             # imageio.imsave('data/test_images/HMres.tif', openHM)
-
-    # Histogram Equalization Function
-    def _histogram_equalization(self, image, number_bins=256, display=None):
-        # from http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html
-
-        # get image histogram
-        image_histogram, bins = np.histogram(image.flatten(), number_bins, density=True)
-        cdf = image_histogram.cumsum() # cumulative distribution function
-        cdf = 255 * cdf / cdf[-1] # normalize
-
-        # use linear interpolation of cdf to find new pixel values
-        image_equalized = np.interp(image.flatten(), bins[:-1], cdf)
-
-        return image_equalized.reshape(image.shape), cdf
-
-    # Histogram Equalization Function
-    # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
-    # def _histogram_equalization(self, img, display=None):
-    #     cdf = self._getCDF(img);
-
-    #     # The minimum histogram value (excluding 0) by using the Numpy masked array concept
-    #     cdf_m = np.ma.masked_equal(cdf,0)
-    #     # And apply the histogram equalization equation as given in https://en.wikipedia.org/wiki/Histogram_equalization
-    #     cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
-        
-    #     # Look-up table with the information for what is the output pixel value for every input pixel value
-    #     cdf = np.ma.filled(cdf_m,0).astype('uint8')
-
-    #     # Apply the transform
-    #     imgHE = cdf[img]
-
-    #     if display:
-    #         # Plot    
-    #         figure2 = plt.figure(2)
-
-    #         # Original Image
-    #         subplot2 = figure2.add_subplot(1,2,1)
-    #         plt.imshow(np.array(img,np.int32),cmap='gray')
-    #         subplot2.set_title('Original Image')
-
-    #         # Histogram Equalized Image
-    #         subplot2 = figure2.add_subplot(1,2,2)
-    #         plt.imshow(np.array(imgHE,np.int32),cmap='gray')
-    #         subplot2.set_title('Histogram Equalized Image')
-    #         plt.show()
-        
-    #     return imgHE
-
-
-    def _getCDF(self, img, display=None):
-        hist, bins = np.histogram(img.flatten(),256)#,[0,256])
-        # cdf: Cumulative Distribution Function
-        # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
-        cdf = hist.cumsum()
-        # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
-        cdf_normalized = cdf * hist.max()/ cdf.max()
-
-        # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
-        # use linear interpolation of cdf to find new pixel values
-        # cdf_normalized = 255 * cdf / cdf[-1] # normalize
-        # image_equalized = np.interp(cdf_normalized.flatten(), bins[:-1], cdf)
-        # return image_equalized.reshape(image_equalized.shape), cdf
-
-        if display:
-            # Plot
-            plt.figure(1)
-
-            # Normalized CDF with red
-            plt.plot(cdf_normalized, color = 'r')
-
-            # Histogram with black
-            plt.hist(img.flatten(),256,[0,256], color = 'k')
-            plt.xlim([0,256])
-
-            # Place labels at the lower right of the plot 
-            plt.legend(('Normalized CDF','Histogram'), loc = 'lower right')
-            plt.show()
-
-        return cdf
-    
-
-def main():
-
-    # Initialize HistogramMatcher & Select histogram matching method
-    histogram_matcher = HistogramMatcher('data/test_images', 'ExactHistogramMatching')
-
-    # Perform histogram matching
-    histogram_matcher.perform_histogram_matching('data/test_images/Fig1.tif', 'data/test_images/Fig2.tif', display=True)
-
-
-if __name__ == "__main__":
-    main()
