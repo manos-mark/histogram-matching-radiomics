@@ -37,6 +37,8 @@ if __name__ == "__main__":
     
     image = sitk.ReadImage(image_path)
     image = sitk.GetArrayFromImage(image)[12,:,:]
+    print(image.ndim)
+    print(image.shape)
 
     mask = sitk.ReadImage(mask_path)
     mask = sitk.GetArrayFromImage(mask)[12,:,:]
@@ -51,7 +53,7 @@ if __name__ == "__main__":
     plt.imshow(mask)        
     plt.title("Segmentation")
 
-    masked_image = remove_mask_from_image(image, mask)
+    # masked_image = remove_mask_from_image(image, mask)
 
     # plt.subplot(2,2,3)
     # plt.imshow(sitk.GetArrayFromImage(masked_image)[12,:,:])        
