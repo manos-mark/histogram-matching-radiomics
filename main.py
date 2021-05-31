@@ -17,7 +17,7 @@ def main():
     dataset = feature_extractor.import_prepare_dataset(DATASET_PATH)
         
     # Execute batch processing to extract features
-    feature_extractor.extract_features(dataset, FEATURES_OUTPUT_PATH)
+    # feature_extractor.extract_features(dataset, FEATURES_OUTPUT_PATH)
 
     # Get the filepaths from the images only (without the segmentations)
     dataset = [value['Image'] for value in dataset.values()]
@@ -29,10 +29,13 @@ def main():
     histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
     # Select Reference Image
-    # reference_img = imageio.imread(os.path.join('data', 'test_images', 'Fig2.tif'))
+    reference_img = imageio.imread(os.path.join('data', 'test_images', 'Fig2.tif'))
+    target_img = imageio.imread(os.path.join('data', 'test_images', 'Fig1.tif'))
+    
+    histogram_matcher.perform_histogram_matching(target_img, reference_img, display=True)
 
     # Perform histogram matching
-    histogram_matcher.perform_batch_histogram_matching(dataset, dataset[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    # histogram_matcher.perform_batch_histogram_matching(dataset, dataset[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ########################################### COMPARE RESULTS ##########################################

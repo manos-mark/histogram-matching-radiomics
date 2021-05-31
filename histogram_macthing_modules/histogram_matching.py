@@ -36,16 +36,20 @@ class HistogramMatcher:
     # Histogram Macthing Function for a batch of images
     def perform_batch_histogram_matching(self, target_images, reference_img, display=False):
         for image in target_images:
-            self.perform_histogram_matching(image, reference_img, display=False)
+            self.perform_histogram_matching(image, reference_img, display=display)
 
 
     # Histogram Matching Function 
     def perform_histogram_matching(self, target_img, reference_img, display=False):
-        target_img_path = target_img
+
+        target_img_path = None
+        target_img_name = None
 
         # Checking if the value of the variable is a filepath or an image array 
         # Read Target Image from the path
         if isinstance(target_img, str):
+            target_img_path = target_img
+            target_img_name = target_img_path.split('/')[-1]
             target_img = imageio.imread(target_img)
         # Do nothing if variable is an image
         elif isinstance(target_img, imageio.core.util.Array):
@@ -63,19 +67,29 @@ class HistogramMatcher:
         else:
             raise TypeError("Unkown file type: %{}".format(type(reference_img)))
 
+        if len(target_img.shape) != len(reference_img.shape):
+            raise ValueError("Target image shape must be the same as the reference image shape")
+
         # Histogram Equalization to the target image
-        target_image_equalized = np.zeros(target_img.shape)
-        # loop over the channels of the image
-        for i in range(target_img.shape[0]):
-            image = target_img[i, :, :]
-            target_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
-            
+        if len(target_img.shape) == 3:  
+            target_image_equalized = np.zeros(target_img.shape)
+            # loop over the channels of the image
+            for i in range(target_img.shape[0]):
+                image = target_img[i, :, :]
+                target_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
+        else:
+            target_image_equalized = self._histogram_equalization(target_img)[0]
+
+
         # Histogram Equalization to the reference image
-        reference_image_equalized = np.zeros(reference_img.shape)
-        # loop over the channels of the image
-        for i in range(reference_img.shape[0]):
-            image = reference_img[i, :, :]
-            reference_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
+        if len(reference_img.shape) == 3:    
+            reference_image_equalized = np.zeros(reference_img.shape)
+            # loop over the channels of the image
+            for i in range(reference_img.shape[0]):
+                image = reference_img[i, :, :]
+                reference_image_equalized[i, :, :] = self._histogram_equalization(image)[0]
+        else:
+            reference_image_equalized = self._histogram_equalization(reference_img)[0]
 
         # # Save the histogram equalized target image
         # imageio.imsave('data/test_images/HEtarget.tif', target_img)
@@ -86,21 +100,20 @@ class HistogramMatcher:
         
         # Find the histogram of the reference image 
         reference_histogram = self.histogram_matcher.get_histogram(reference_img)
-        
+
         # Match target image to the reference histogram
         new_target_img = self.histogram_matcher.match_image_to_histogram(target_image_equalized, reference_histogram)
         
         # Result image
         new_target_img = np.uint8(new_target_img)
 
-        func = nib.load(target_img_path)
-
-        # to save this 3D (ndarry) numpy use this
-        ni_img = nib.Nifti1Image(new_target_img, func.affine)
-
-        nib.save(ni_img, os.path.join(self.output_path, 'test.nii'))
-
-        # imageio.imsave(os.path.join(self.output_path, 'HMresPNG.nii'), new_target_img) # TODO: change the name of the output image
+        if len(target_img.shape) == 2:
+            imageio.imsave(os.path.join(self.output_path, 'result_image.tif'), new_target_img)
+        else:
+            # to save this 3D (ndarry) numpy use this
+            func = nib.load(target_img_path)
+            ni_img = nib.Nifti1Image(new_target_img, func.affine)
+            nib.save(ni_img, os.path.join(self.output_path, target_img_name))
         
         if display:
             # Plot
@@ -113,31 +126,44 @@ class HistogramMatcher:
 
             # Target Image
             subplot = figure3.add_subplot(221)
-            plt.imshow(np.array(target_img,np.int32))
+            if len(target_img.shape) == 3:
+                plt.imshow(np.array(target_img[12,:,:],np.int32))
+            else:
+                plt.imshow(np.array(target_img,np.int32))
             subplot.set_title('Target Image')
 
             # Reference Image
             subplot = figure3.add_subplot(222)
-            plt.imshow(np.array(reference_img,np.int32))
+            if len(reference_img.shape) == 3:
+                plt.imshow(np.array(reference_img[12,:,:],np.int32))
+            else:
+                plt.imshow(np.array(reference_img,np.int32))
             subplot.set_title('Reference Image')
             
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(223)
-            plt.imshow(np.array(new_target_img,np.int32))
+            if len(new_target_img.shape) == 3:
+                plt.imshow(np.array(new_target_img[12,:,:],np.int32))
+            else:
+                plt.imshow(np.array(new_target_img,np.int32))
+
             subplot.set_title('Image Matched to Histogram')
 
             # Save the result histogram matched image
-            imageio.imsave('data/test_images/HMresPNG.png', new_target_img)
-            openHM = imageio.imread('data/test_images/HMresPNG.png')
+            # imageio.imsave('data/test_images/HMresPNG.png', new_target_img)
+            # openHM = imageio.imread('data/test_images/HMresPNG.png')
             
             # Result image's Histogram 
             subplot = figure3.add_subplot(224)
             subplot.set_title('Result Image Histogram')
-            plt.hist(openHM.flatten(),256,[0,256], color = 'b')
+            if len(new_target_img.shape) == 3:
+                plt.hist(new_target_img[12,:,:].flatten(),256, color = 'b')
+            else:
+                plt.hist(new_target_img.flatten(),256, color = 'b')
             plt.xlim([0,256])
             plt.show()
             
-            imageio.imsave('data/test_images/HMres.tif', openHM)
+            # imageio.imsave('data/test_images/HMres.tif', openHM)
 
     # Histogram Equalization Function
     def _histogram_equalization(self, image, number_bins=256, display=None):
