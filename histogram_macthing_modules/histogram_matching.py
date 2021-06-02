@@ -73,24 +73,16 @@ class HistogramMatcher:
 
         # Histogram Equalization to the target image
         if len(target_img.shape) == 3:  
-            target_image_equalized = np.zeros(target_img.shape)
-            # loop over the channels of the image
-            for i in range(target_img.shape[0]):
-                image = target_img[i, :, :]
-                target_image_equalized[i, :, :] = utils.histogram_equalization(image)[0]
+            target_image_equalized = utils.histogram_equalization_3D(target_img)
         else:
-            target_image_equalized = utils.histogram_equalization(target_img)[0]
+            target_image_equalized = utils.histogram_equalization_2D(target_img)
 
 
         # Histogram Equalization to the reference image
         if len(reference_img.shape) == 3:    
-            reference_image_equalized = np.zeros(reference_img.shape)
-            # loop over the channels of the image
-            for i in range(reference_img.shape[0]):
-                image = reference_img[i, :, :]
-                reference_image_equalized[i, :, :] = utils.histogram_equalization(image)[0]
+            reference_image_equalized = utils.histogram_equalization_3D(reference_img)
         else:
-            reference_image_equalized = utils.histogram_equalization(reference_img)[0]
+            reference_image_equalized = utils.histogram_equalization_2D(reference_img)
 
         # # Save the histogram equalized target image
         # imageio.imsave('data/test_images/HEtarget.tif', target_img)
@@ -100,20 +92,20 @@ class HistogramMatcher:
 
         
         # Find the histogram of the reference image 
-        reference_histogram = self.histogram_matcher.get_histogram(reference_img)
+        reference_histogram = self.histogram_matcher.get_histogram(reference_image_equalized)
 
         # Match target image to the reference histogram
-        new_target_img = self.histogram_matcher.match_image_to_histogram(target_image_equalized, reference_histogram)
+        hist_matched_img = self.histogram_matcher.match_image_to_histogram(target_image_equalized, reference_histogram)
         
         # Result image
-        new_target_img = np.uint8(new_target_img)
+        # hist_matched_img = np.uint8(hist_matched_img)
 
         if len(target_img.shape) == 2:
-            imageio.imsave(os.path.join(self.output_path, 'result_image.tif'), new_target_img)
+            imageio.imsave(os.path.join(self.output_path, 'result_image.tif'), hist_matched_img)
         else:
             # to save this 3D (ndarry) numpy use this
             func = nib.load(target_img_path)
-            ni_img = nib.Nifti1Image(new_target_img, func.affine)
+            ni_img = nib.Nifti1Image(hist_matched_img, func.affine)
             nib.save(ni_img, os.path.join(self.output_path, target_img_name))
         
         if display:
@@ -128,25 +120,25 @@ class HistogramMatcher:
             # Target Image
             subplot = figure3.add_subplot(221)
             if len(target_img.shape) == 3:
-                plt.imshow(np.array(target_img[12,:,:],np.int32), cmap='gray')
+                plt.imshow(np.array(target_image_equalized[12,:,:],np.int32))
             else:
-                plt.imshow(np.array(target_img,np.int32), cmap='gray')
-            subplot.set_title('Target Image')
+                plt.imshow(np.array(target_image_equalized,np.int32))
+            subplot.set_title('Target Image Equalized')
 
             # Reference Image
             subplot = figure3.add_subplot(222)
             if len(reference_img.shape) == 3:
-                plt.imshow(np.array(reference_img[12,:,:],np.int32), cmap='gray')
+                plt.imshow(np.array(reference_image_equalized[12,:,:],np.int32))
             else:
-                plt.imshow(np.array(reference_img,np.int32), cmap='gray')
-            subplot.set_title('Reference Image')
+                plt.imshow(np.array(reference_image_equalized,np.int32))
+            subplot.set_title('Reference Image Equalized')
             
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(223)
-            if len(new_target_img.shape) == 3:
-                plt.imshow(np.array(new_target_img[12,:,:],np.int32), cmap='gray')
+            if len(hist_matched_img.shape) == 3:
+                plt.imshow(np.array(hist_matched_img[12,:,:],np.int32))
             else:
-                plt.imshow(np.array(new_target_img,np.int32), cmap='gray')
+                plt.imshow(np.array(hist_matched_img,np.int32))
 
             subplot.set_title('Image Matched to Histogram')
 
@@ -157,10 +149,10 @@ class HistogramMatcher:
             # Result image's Histogram 
             subplot = figure3.add_subplot(224)
             subplot.set_title('Result Image Histogram')
-            if len(new_target_img.shape) == 3:
-                plt.hist(new_target_img[12,:,:].flatten(),256, color = 'b')
+            if len(hist_matched_img.shape) == 3:
+                plt.hist(hist_matched_img[12,:,:].flatten(),256,[0,256], color = 'b')
             else:
-                plt.hist(new_target_img.flatten(),256, color = 'b')
+                plt.hist(hist_matched_img.flatten(),256,[0,256], color = 'b')
             plt.xlim([0,256])
             plt.show()
             

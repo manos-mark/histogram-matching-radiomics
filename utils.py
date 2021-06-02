@@ -4,19 +4,73 @@ import matplotlib.pyplot as plt
 import SimpleITK as sitk
 import imageio
 
+
 # Histogram Equalization Function
-def histogram_equalization(image, number_bins=256, display=None):
-    # from http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html
+# Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
+def histogram_equalization_2D(img, display=False):
+    # cdf, bins = getCDF(img, display)
+    hist, bins = np.histogram(img.flatten(),256,[0,256])
+    # cdf: Cumulative Distribution Function
+    # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
+    cdf = hist.cumsum()
+    # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
+    cdf_normalized = cdf * hist.max()/ cdf.max()
 
-    # get image histogram
-    image_histogram, bins = np.histogram(image.flatten(), number_bins, density=True)
-    cdf = image_histogram.cumsum() # cumulative distribution function
-    cdf = 255 * cdf / cdf[-1] # normalize
+    # The minimum histogram value (excluding 0) by using the Numpy masked array concept
+    cdf_m = np.ma.masked_equal(cdf_normalized,0)
+    # And apply the histogram equalization equation as given in https://en.wikipedia.org/wiki/Histogram_equalization
+    cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
+    
+    # Look-up table with the information for what is the output pixel value for every input pixel value
+    cdf = np.ma.filled(cdf_m,0).astype('uint8')
 
-    # use linear interpolation of cdf to find new pixel values
-    image_equalized = np.interp(image.flatten(), bins[:-1], cdf)
+    # Apply the transform
+    image_equalized = cdf[img]
 
-    return image_equalized.reshape(image.shape), cdf
+    # # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
+    # # use linear interpolation of cdf to find new pixel values
+    # image_equalized = np.interp(img.flatten(), bins[:-1], cdf)    
+    # image_equalized = image_equalized.reshape(img.shape)
+
+    if display:
+        # Plot    
+        figure2 = plt.figure(2)
+
+        # Original Image
+        subplot2 = figure2.add_subplot(1,2,1)
+        plt.imshow(img, cmap='gray')
+        subplot2.set_title('Original Image')
+
+        # Histogram Equalized Image
+        subplot2 = figure2.add_subplot(1,2,2)
+        plt.imshow(image_equalized ,cmap='gray')
+        subplot2.set_title('Histogram Equalized Image')
+        plt.show()
+
+    return image_equalized
+
+    
+# Histogram Equalization Function
+def histogram_equalization_3D(image, number_bins=256):
+    image_equalized = np.zeros(image.shape)
+    
+    # loop over the channels of the image
+    for i in range(image.shape[0]):
+        img = image[i, :, :]
+
+        # from http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html
+        # get image histogram
+        image_histogram, bins = np.histogram(img.flatten(), number_bins, density=True)
+        cdf = image_histogram.cumsum() # cumulative distribution function
+        cdf = 255 * cdf / cdf[-1] # normalize
+
+        # use linear interpolation of cdf to find new pixel values
+        img_eq = np.interp(img.flatten(), bins[:-1], cdf)
+        img_eq = img_eq.reshape(img.shape)
+
+        image_equalized[i, :, :] = img_eq
+
+    return image_equalized
 
 
 def rgb2gray(rgb):
@@ -25,66 +79,29 @@ def rgb2gray(rgb):
 
 def remove_mask_from_image(img, mask):    
     gray_img = rgb2gray(img)
-    cv.imshow('Gray Img', gray_img)
+    # gray_img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
+    cv.imshow('Gray Img Slice', gray_img)
 
     gray_mask = rgb2gray(mask)
-    cv.imshow('Gray Mask', gray_mask)
+    # gray_mask = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
+    cv.imshow('Gray Mask Slice', gray_mask)
 
     # blank = np.zeros(img.shape[:2], dtype='uint8')
     # mask = ~cv.circle(blank, (img.shape[1]//2, img.shape[0]//2), 100, 255, -1)
 
     masked = cv.bitwise_and(gray_img, gray_mask)
+    cv.imshow('Masked Img Slice', gray_img)
 
     return masked
 
 
-    # Histogram Equalization Function
-# Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
-# def _histogram_equalization(self, img, display=None):
-#     cdf = self._getCDF(img);
-
-#     # The minimum histogram value (excluding 0) by using the Numpy masked array concept
-#     cdf_m = np.ma.masked_equal(cdf,0)
-#     # And apply the histogram equalization equation as given in https://en.wikipedia.org/wiki/Histogram_equalization
-#     cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
-    
-#     # Look-up table with the information for what is the output pixel value for every input pixel value
-#     cdf = np.ma.filled(cdf_m,0).astype('uint8')
-
-#     # Apply the transform
-#     imgHE = cdf[img]
-
-#     if display:
-#         # Plot    
-#         figure2 = plt.figure(2)
-
-#         # Original Image
-#         subplot2 = figure2.add_subplot(1,2,1)
-#         plt.imshow(np.array(img,np.int32),cmap='gray')
-#         subplot2.set_title('Original Image')
-
-#         # Histogram Equalized Image
-#         subplot2 = figure2.add_subplot(1,2,2)
-#         plt.imshow(np.array(imgHE,np.int32),cmap='gray')
-#         subplot2.set_title('Histogram Equalized Image')
-#         plt.show()
-    
-#     return imgHE
-
-
 def getCDF(img, display=None):
-    hist, bins = np.histogram(img.flatten(),256)#,[0,256])
+    hist, bins = np.histogram(img.flatten(),256,[0,256])
     # cdf: Cumulative Distribution Function
     # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
     cdf = hist.cumsum()
     # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
     cdf_normalized = cdf * hist.max()/ cdf.max()
-
-    # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
-    # use linear interpolation of cdf to find new pixel values
-    # cdf_normalized = 255 * cdf / cdf[-1] # normalize
-    # image_equalized = np.interp(cdf_normalized.flatten(), bins[:-1], cdf)
-    # return image_equalized.reshape(image_equalized.shape), cdf
 
     if display:
         # Plot
@@ -101,7 +118,7 @@ def getCDF(img, display=None):
         plt.legend(('Normalized CDF','Histogram'), loc = 'lower right')
         plt.show()
 
-    return cdf
+    return cdf, bins
 
 
 if __name__ == "__main__":
@@ -120,11 +137,11 @@ if __name__ == "__main__":
     plt.figure(figsize=(20,20))
 
     plt.subplot(2,2,1)
-    plt.imshow(np.array(image[12,:,:],np.int32), cmap="gray")
+    plt.imshow(image[12,:,:], cmap="gray")
     plt.title("Brain")
 
     plt.subplot(2,2,2)
-    plt.imshow(np.array(mask[12,:,:],np.int32), cmap="gray")        
+    plt.imshow(mask[12,:,:], cmap="gray")       
     plt.title("Segmentation")
 
     masked_image = np.zeros(image.shape)
@@ -135,14 +152,15 @@ if __name__ == "__main__":
 
 
     plt.subplot(2,2,3)
-    plt.imshow(np.array(masked_image[12,:,:],np.int32))        
+    plt.imshow(masked_image[12,:,:])        
     plt.title("Masked Image")
 
-    plt.figure()
+    plt.subplot(2,2,4)
     plt.title('Graylevel Histogram')
     plt.xlabel('Bins')
     plt.ylabel('Number of pixels')
-    plt.hist(masked_image.flatten())
+    plt.hist(masked_image.flatten(), 256,[0,256], color = 'b')
+    # plt.hist(np.histogram(masked_image.flatten(),256))
     plt.xlim([0,256])
 
     plt.show()
