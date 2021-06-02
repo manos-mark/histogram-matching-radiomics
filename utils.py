@@ -7,9 +7,9 @@ import imageio
 
 # Histogram Equalization Function
 # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
-def histogram_equalization_2D(img, display=False):
+def histogram_equalization_2D(img, number_bins=256, display=False):
     # cdf, bins = getCDF(img, display)
-    hist, bins = np.histogram(img.flatten(),256,[0,256])
+    hist, bins = np.histogram(img.flatten(), number_bins, [0,256])
     # cdf: Cumulative Distribution Function
     # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
     cdf = hist.cumsum()
@@ -26,11 +26,6 @@ def histogram_equalization_2D(img, display=False):
 
     # Apply the transform
     image_equalized = cdf[img]
-
-    # # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
-    # # use linear interpolation of cdf to find new pixel values
-    # image_equalized = np.interp(img.flatten(), bins[:-1], cdf)    
-    # image_equalized = image_equalized.reshape(img.shape)
 
     if display:
         # Plot    
@@ -60,11 +55,23 @@ def histogram_equalization_3D(image, number_bins=256):
 
         # from http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html
         # get image histogram
-        image_histogram, bins = np.histogram(img.flatten(), number_bins, density=True)
-        cdf = image_histogram.cumsum() # cumulative distribution function
-        cdf = 255 * cdf / cdf[-1] # normalize
+        hist, bins = np.histogram(img.flatten(), number_bins)#, [0,256])
+        cdf = hist.cumsum() # cumulative distribution function
+        cdf = cdf * hist.max()/ cdf.max()#255 * cdf / cdf[-1] # normalize
 
-        # use linear interpolation of cdf to find new pixel values
+        # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
+        cdf_normalized = cdf * hist.max()/ cdf.max()
+
+        # The minimum histogram value (excluding 0) by using the Numpy masked array concept
+        cdf_m = np.ma.masked_equal(cdf_normalized,0)
+        # And apply the histogram equalization equation as given in https://en.wikipedia.org/wiki/Histogram_equalization
+        cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
+        
+        # Look-up table with the information for what is the output pixel value for every input pixel value
+        cdf = np.ma.filled(cdf_m,0).astype('uint8')
+
+        # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
+        # use linear interpolation of cdf to find new pixel values (for 3D images)
         img_eq = np.interp(img.flatten(), bins[:-1], cdf)
         img_eq = img_eq.reshape(img.shape)
 
@@ -78,22 +85,15 @@ def rgb2gray(rgb):
 
 
 def remove_mask_from_image(img, mask):    
-    gray_img = rgb2gray(img)
-    # gray_img = cv.cvtColor(img, cv.COLOR_RGB2GRAY)
-    cv.imshow('Gray Img Slice', gray_img)
 
+    gray_img = rgb2gray(img)
     gray_mask = rgb2gray(mask)
-    # gray_mask = cv.cvtColor(mask, cv.COLOR_RGB2GRAY)
-    cv.imshow('Gray Mask Slice', gray_mask)
 
     # blank = np.zeros(img.shape[:2], dtype='uint8')
     # mask = ~cv.circle(blank, (img.shape[1]//2, img.shape[0]//2), 100, 255, -1)
 
-    masked = cv.bitwise_and(gray_img, gray_mask)
-    cv.imshow('Masked Img Slice', gray_img)
-
-    return masked
-
+    return cv.bitwise_and(gray_img, gray_mask)
+    
 
 def getCDF(img, display=None):
     hist, bins = np.histogram(img.flatten(),256,[0,256])
@@ -152,14 +152,14 @@ if __name__ == "__main__":
 
 
     plt.subplot(2,2,3)
-    plt.imshow(masked_image[12,:,:])        
+    plt.imshow(masked_image[12,:,:], cmap='gray')        
     plt.title("Masked Image")
 
     plt.subplot(2,2,4)
     plt.title('Graylevel Histogram')
     plt.xlabel('Bins')
     plt.ylabel('Number of pixels')
-    plt.hist(masked_image.flatten(), 256,[0,256], color = 'b')
+    plt.hist(masked_image[12,:,:].flatten(), 256,[0,256], color = 'b')
     # plt.hist(np.histogram(masked_image.flatten(),256))
     plt.xlim([0,256])
 
