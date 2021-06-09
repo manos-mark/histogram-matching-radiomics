@@ -2,6 +2,7 @@ from radiomics_modules.feature_extraction import FeatureExtractor
 from histogram_macthing_modules.histogram_matching import HistogramMatcher
 
 import imageio
+import utils
 import os
 
 
@@ -23,50 +24,43 @@ def main():
     dataset_images = [value['Image'] for value in dataset.values()]
 
 
-    ######################################################################################################
-    ######################################### HISTOGRAM MATCHING #########################################
+    # ######################################################################################################
+    # ######################################### HISTOGRAM MATCHING #########################################
 
-    # Initialize HistogramMatcher & select histogram matching method
-    histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
+    # # Initialize HistogramMatcher & select histogram matching method
+    # histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
-    # Select Reference Image
-    # reference_img = imageio.imread(os.path.join('data', 'test_images', 'Fig2.tif'))
-    # target_img = imageio.imread(os.path.join('data', 'test_images', 'Fig1.tif'))
+    # # # Select Reference Image
+    # # reference_img = imageio.imread(os.path.join('data', 'dataset', 'TCGA_CS_4941_19960909', 'TCGA_CS_4941_19960909_10.tif'))
+    # # target_img = imageio.imread(os.path.join('data', 'dataset', 'TCGA_CS_4941_19960909', 'TCGA_CS_4941_19960909_11.tif'))
     
-    # histogram_matcher.perform_histogram_matching(target_img, reference_img, display=True)
+    # # histogram_matcher.perform_histogram_matching(target_img, reference_img, display=True)
 
-    # Perform histogram matching
-    # histogram_matcher.perform_batch_histogram_matching(dataset_images, dataset_images[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    # # Perform histogram matching
+    # histogram_matcher.perform_batch_histogram_matching(dataset_images, dataset_images[1], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
 
-    ######################################################################################################
-    ##################################### EXTRACT RADIOMICS FEATURES #####################################
-    #####################################    FROM THE NEW DATASET    #####################################
+    # ######################################################################################################
+    # ##################################### EXTRACT RADIOMICS FEATURES #####################################
+    # #####################################    FROM THE NEW DATASET    #####################################
 
-    # Import the dataset
-    new_dataset = feature_extractor.import_prepare_dataset(NEW_DATASET_OUTPUT_PATH)
+    # # Import the dataset
+    # new_dataset = feature_extractor.import_prepare_dataset(NEW_DATASET_OUTPUT_PATH)
 
-    # Copy the segmentations from the old dataset to the new one
-    for key, value in new_dataset.items():
-        # Get the image path, replace it with the image path from the old dataset
-        # and add _roi in order to create the mask path
-        path = value['Image'].split('.')                                 # split the path into a list
-        path[0] = path[0].replace(NEW_DATASET_OUTPUT_PATH, DATASET_PATH) # replace the new path with the old one
-        path.insert(1, '_roi.')                                          # append _roi
-        path = ''.join(path)                                             # join the list elements into a string
+    # # We don't have the segmentations on the new dataset folder because we created it in the previous step
+    # # by applying histogram matching on the image, not the segmentation.
+    # # So we need to copy the segmentations paths from the old dataset and add them to the new dataset's dictionary
+    # new_dataset = utils.insert_segmenetions_path_to_dict(new_dataset, NEW_DATASET_OUTPUT_PATH, DATASET_PATH)
 
-        # Add mask path from the old dataset to new dataset dictionary
-        new_dataset[key]['Mask'] = path
+    # # Execute batch processing to extract features
+    # feature_extractor.extract_features(new_dataset, NEW_FEATURES_OUTPUT_PATH)
 
-    # Execute batch processing to extract features
-    feature_extractor.extract_features(new_dataset, NEW_FEATURES_OUTPUT_PATH)
-
-    # Get the filepaths from the images only (without the segmentations)
-    new_dataset = [value['Image'] for value in new_dataset.values()]
+    # # Get the filepaths from the images only (without the segmentations)
+    # new_dataset = [value['Image'] for value in new_dataset.values()]
 
     
-    ######################################################################################################
-    ########################################### COMPARE RESULTS ##########################################
+    # ######################################################################################################
+    # ########################################### COMPARE RESULTS ##########################################
 
     
 

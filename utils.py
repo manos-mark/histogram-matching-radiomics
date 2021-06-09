@@ -5,6 +5,21 @@ import SimpleITK as sitk
 import imageio
 
 
+def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path):
+    for key, value in dataset.items():
+        # Get the image path, replace it with the image path from the old dataset
+        # and add _roi in order to create the mask path
+        path = value['Image'].split('.')                                 # split the path into a list
+        path[0] = path[0].replace(new_dataset_output_path, dataset_path) # replace the new path with the old one
+        path.insert(1, '_roi.')                                          # append _roi
+        path = ''.join(path)                                             # join the list elements into a string
+
+        # Add mask path from the old dataset to new dataset dictionary
+        dataset[key]['Mask'] = path
+
+    return dataset
+
+
 # Histogram Equalization Function
 # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
 def histogram_equalization_2D(img, number_bins=256, display=False):
@@ -49,7 +64,7 @@ def histogram_equalization_2D(img, number_bins=256, display=False):
 def histogram_equalization_3D(image, number_bins=256):
     image_equalized = np.zeros(image.shape)
     
-    # loop over the channels of the image
+    # loop over the slices of the image
     for i in range(image.shape[0]):
         img = image[i, :, :]
 
@@ -73,7 +88,7 @@ def histogram_equalization_3D(image, number_bins=256):
         # https://stackoverflow.com/questions/28518684/histogram-equalization-of-grayscale-images-with-numpy/28520445
         # use linear interpolation of cdf to find new pixel values (for 3D images)
         img_eq = np.interp(img.flatten(), bins[:-1], cdf)
-        img_eq = img_eq.reshape(img.shape)
+        img_eq = img_eq.reshape((image.shape[1], image.shape[2]))
 
         image_equalized[i, :, :] = img_eq
 

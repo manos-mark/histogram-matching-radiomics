@@ -25,28 +25,31 @@ class FeatureExtractor:
 
     def import_prepare_dataset(self, dataset_path):
         cases_dict = {}
-        for _, _, files in os.walk(dataset_path):
-            for file in files:
-                # # Skip case when there is duplicate file in any patient directory
-                # if filename in cases_dict.keys() and 'Image' in cases_dict[filename].keys() \
-                #         and 'Mask' in cases_dict[filename].keys():
-                #     #self.logger.warning('Batch %s: Already exists, skipping this case...', filename)
-                #     continue
+        import glob
+        dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+        
+        for dir in dirnames:
+            filenames = glob.glob(os.path.join(dir, "*.tif"))
 
-                file_path = os.path.join(dataset_path, file)
+            for file in filenames:
 
-                if "_roi" in file:
-                    filename = file.rsplit("_")[0]
+                if "_mask" in file:
+                    filename = file.rsplit("_")[:-1]
+                    filename = '_'.join(filename)
                     if filename in cases_dict.keys():
-                        cases_dict[filename].update({'Mask': file_path})
+                        cases_dict[filename].update({'Mask': file})
                     else:
-                        cases_dict[filename] = {'Mask': file_path}
-                elif file.endswith(".nii"):
-                    filename = file.rsplit(".")[0]
+                        cases_dict[filename] = {'Mask': file}
+
+                elif file.endswith(".tif"):
+                    filename = file.rsplit(".")[:-1]
+                    # filename = file.rsplit("_")[:-1]
+                    filename = ''.join(filename)
+                    print(filename)
                     if filename in cases_dict.keys():
-                        cases_dict[filename].update({'Image': file_path})
+                        cases_dict[filename].update({'Image': file})
                     else:
-                        cases_dict[filename] = {'Image': file_path}
+                        cases_dict[filename] = {'Image': file}
 
             if not cases_dict:
                 raise FileNotFoundError("Failed to import dataset.")
@@ -71,7 +74,8 @@ class FeatureExtractor:
                 continue
 
             feature_vector = collections.OrderedDict(case)
-            feature_vector['ID'] = image_filepath.rsplit(".")[0]
+            # feature_vector['ID'] = image_filepath.rsplit(".")[0]
+            feature_vector['ID'] = image_filepath.rsplit("_")[-1]
             feature_vector['Image'] = os.path.basename(image_filepath)
             feature_vector['Mask'] = os.path.basename(mask_filepath)
 
