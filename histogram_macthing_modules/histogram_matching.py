@@ -53,8 +53,9 @@ class HistogramMatcher:
         # Checking if the value of the variable is a filepath or an image array 
         # Read Target Image from the path
         if isinstance(target_img, str):
-            target_img_path = target_img
-            target_img_name = target_img_path.split('/')[-1]
+            target_img_path = target_img.split('/')[-2]
+            target_img_name = target_img.split('/')[-1]
+
             target_img = skimage.io.imread(target_img)
         # Do nothing if variable is an image
         elif isinstance(target_img, np.ndarray):
@@ -76,8 +77,6 @@ class HistogramMatcher:
             raise ValueError("Target image shape must be the same as the reference image shape") # TODO: is this right?
 
         # Histogram Equalization to the target image
-        print("target_img.shape: ", target_img.shape)
-        print("reference_img.shape: ", reference_img.shape)
         if len(target_img.shape) == 3:  
             target_image_equalized = utils.histogram_equalization_3D(target_img)
         else:
@@ -89,13 +88,6 @@ class HistogramMatcher:
         else:
             reference_image_equalized = utils.histogram_equalization_2D(reference_img)
 
-        # # Save the histogram equalized target image
-        # imageio.imsave('data/test_images/HEtarget.tif', target_img)
-
-        # # Save the histogram equalized reference image
-        # imageio.imsave('data/test_images/HErefer.tif', reference_img)
-
-        
         # Find the histogram of the reference image 
         reference_histogram = self.histogram_matcher.get_histogram(reference_image_equalized)
 
@@ -104,8 +96,11 @@ class HistogramMatcher:
 
         # Result image
         hist_matched_img = np.uint8(hist_matched_img)
-
-        skimage.io.imsave(os.path.join(self.output_path, 'result_image.tif'), hist_matched_img)
+        
+        new_dir = os.path.join(self.output_path, target_img_path)
+        if not os.path.isdir(new_dir):
+            os.mkdir(new_dir)
+        skimage.io.imsave(os.path.join(new_dir, target_img_name), hist_matched_img)
         
         if display:
             # Plot

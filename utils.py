@@ -5,21 +5,23 @@ import matplotlib.pyplot as plt
 import SimpleITK as sitk
 import imageio
 import skimage.io
+import nibabel as nib
 import glob
 
 
-def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path):
+def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
         # Get the image path, replace it with the image path from the old dataset
         # and add _roi in order to create the mask path
         path = value['Image'].split('.')                                 # split the path into a list
         path[0] = path[0].replace(new_dataset_output_path, dataset_path) # replace the new path with the old one
-        path.insert(1, '_roi.')                                          # append _roi
-        path = ''.join(path)                                             # join the list elements into a string
+        path.insert(1, '_mask.')                                          # append _roi
+        path = ''.join(path)
+        path = path.replace('_' + contrast_type, '')                                             # join the list elements into a string
 
         # Add mask path from the old dataset to new dataset dictionary
         dataset[key]['Mask'] = path
-
+        
     return dataset
 
 
@@ -42,7 +44,6 @@ def histogram_equalization_2D(img, number_bins=256, display=False):
     # Look-up table with the information for what is the output pixel value for every input pixel value
     cdf = np.ma.filled(cdf_m,0).astype('uint8')
 
-    print(img)
     # Apply the transform
     image_equalized = cdf[img]
 
@@ -102,6 +103,69 @@ def histogram_equalization_3D(image, number_bins=256):
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
 
+def merge_slices_into_3D_image(dataset_path, contrast_type):
+    dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+        
+    for dir in dirnames:
+        filenames = glob.glob(os.path.join(dir, "*.tif"))
+        first_dimension = second_dimension = third_dimension = 0
+        
+        # Count the number of slices and get the shape of the image
+        # to initialize the dimensions in order to initialize 
+        # the following arrays (mask and image representing the 3D images)
+        for file in filenames:
+            if "_mask" in file:
+                third_dimension += 1
+            # Execute this only once
+            if first_dimension == 0:
+                first_dimension = second_dimension = skimage.io.imread(file).shape[0]
+       
+        mask = np.zeros([first_dimension, second_dimension, third_dimension], dtype=np.uint8)
+        image = np.zeros([first_dimension, second_dimension, third_dimension], dtype=np.uint8)
+
+        for file in filenames:
+            i = j = 0
+            # Avoid already preprocessed images
+            if "_mask" in file:
+                mask[:,:,i] = skimage.io.imread(file)
+                i += 1
+            elif contrast_type in file:
+                image[:,:,j] = skimage.io.imread(file)
+                j += 1
+
+
+        image_name = file.rsplit(".")[:-1]
+        image_name = '.'.join(image_name)
+        image_name = image_name + '_' + contrast_type + '-3D.nii'
+
+        # image = nib.Nifti1Image(image, affine=np.eye(4))
+        # nib.save(image, image_name)
+        imsave(image_name, image)
+
+        mask_name = file.rsplit(".")[:-1]
+        mask_name = '.'.join(mask_name)
+        mask_name = mask_name + '_' + contrast_type + '-3D_mask.nii'
+
+        # mask = nib.Nifti1Image(mask, affine=np.eye(4))
+        # nib.save(mask, mask_name)
+        imsave(mask_name, mask)
+
+def imsave(fname, arr):
+    sitk_img = sitk.GetImageFromArray(arr, isVector=True)
+    sitk.WriteImage(sitk_img, fname)
+
+    # sitk_img = sitk.GetImageFromArray(np.around(arr*255).astype(np.uint8), isVector=True)
+    # sitk.WriteImage(sitk_img, fname)
+
+    # plt.imsave(fname, arr, cmap='gray')
+
+    # plt.imsave(fname, np.around(arr*255).astype(np.uint8), cmap='gray')
+
+    # skimage.io.imsave(fname, arr)
+
+    # skimage.io.imsave(fname, arr, plugin='simpleitk')
+
+    # skimage.io.imsave(fname, np.around(arr*255).astype(np.uint8), plugin='simpleitk')
 
 def split_dataset(dataset_path):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
@@ -134,7 +198,7 @@ def split_dataset(dataset_path):
 def get_dataset_as_object(dataset_path, contrast_type):
         cases_dict = {}
         dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
-        
+
         for dir in dirnames:
             filenames = glob.glob(os.path.join(dir, "*.tif"))
 
