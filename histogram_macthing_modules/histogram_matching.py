@@ -35,18 +35,20 @@ class HistogramMatcher:
 
 
     # Histogram Macthing Function for a batch of images
-    def perform_batch_histogram_matching(self, target_images, reference_img, display=False):
-        for image in target_images:
-            self.perform_histogram_matching(image, reference_img, display=display)
+    def match_histograms(self, target_images, reference_img, display=False):
+        if isinstance(target_images, list):
+            for image in target_images:
+                self.__match_histograms(image, reference_img, display=display)
+        else:
+            self.__match_histograms(target_images, reference_img, display=display)
+        
 
 
     # Histogram Matching Function 
-    def perform_histogram_matching(self, target_img, reference_img, display=False):
+    def __match_histograms(self, target_img, reference_img, display=False):
         
         target_img_path = None
         target_img_name = None
-        print(target_img)
-        print(reference_img)
 
         # Checking if the value of the variable is a filepath or an image array 
         # Read Target Image from the path

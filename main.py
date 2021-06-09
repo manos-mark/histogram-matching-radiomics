@@ -30,10 +30,12 @@ def main():
     feature_extractor = FeatureExtractor(PARAMETERS_PATH)
         
     # Execute batch processing to extract features
-    feature_extractor.extract_features(pre_contrast_dataset, FEATURES_OUTPUT_PATH)
+    feature_extractor.extract_features(post_contrast_dataset, FEATURES_OUTPUT_PATH)
 
-    # Get the filepaths from the images only (without the segmentations)
-    dataset_images = [value['Image'] for value in pre_contrast_dataset.values()]
+    # Get the filepaths from the images only (without the segmentations) as a list
+    pre_contrast_images = [value['Image'] for value in pre_contrast_dataset.values()]
+    flair_images = [value['Image'] for value in flair_dataset.values()]
+    post_contrast_images = [value['Image'] for value in post_contrast_dataset.values()]
 
 
     # ######################################################################################################
@@ -42,14 +44,11 @@ def main():
     # Initialize HistogramMatcher & select histogram matching method
     histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
-    # Select Reference Image
-    # reference_img = skimage.io.imread(os.path.join('data', 'dataset', 'TCGA_CS_4941_19960909', 'TCGA_CS_4941_19960909_10.tif'))
-    # target_img = skimage.io.imread(os.path.join('data', 'dataset', 'TCGA_CS_4941_19960909', 'TCGA_CS_4941_19960909_11.tif'))
-    print(pre_contrast_dataset[0])
-    histogram_matcher.perform_histogram_matching(pre_contrast_dataset[0], pre_contrast_dataset[1], display=True)
+    # Perform histogram matching
+    # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
-    # # Perform histogram matching
-    # histogram_matcher.perform_batch_histogram_matching(pre_contrast_dataset, pre_contrast_dataset[1], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    # Perform Batch histogram matching
+    histogram_matcher.match_histograms(flair_images, flair_images[4], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
 
     # ######################################################################################################

@@ -40,8 +40,8 @@ class FeatureExtractor:
                 continue
 
             feature_vector = collections.OrderedDict(case)
-            # feature_vector['ID'] = image_filepath.rsplit(".")[0]
-            feature_vector['ID'] = image_filepath.rsplit("_")[-1]
+            feature_vector['ID'] = image_filepath.rsplit(".")[0].rsplit("/")[-1]
+            # feature_vector['ID'] = image_filepath
             feature_vector['Image'] = os.path.basename(image_filepath)
             feature_vector['Mask'] = os.path.basename(mask_filepath)
 

@@ -170,7 +170,7 @@ setting:
 
 
   ############################################### -3- Feature Class Level ##############################################
-  label: 1 # [1]: Integer, label value of Region of Interest (ROI) in labelmap.
+  label: 255 # [1]: Integer, label value of Region of Interest (ROI) in labelmap.
 
   # Image discretization
   binWidth: # 25 # [25]: Float, > 0, size of the bins when making a histogram and for discretization of the image gray level.
