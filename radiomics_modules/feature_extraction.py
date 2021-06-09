@@ -23,40 +23,6 @@ class FeatureExtractor:
         self.extractor = featureextractor.RadiomicsFeatureExtractor(self.parameters_path)
 
 
-    def import_prepare_dataset(self, dataset_path):
-        cases_dict = {}
-        import glob
-        dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
-        
-        for dir in dirnames:
-            filenames = glob.glob(os.path.join(dir, "*.tif"))
-
-            for file in filenames:
-
-                if "_mask" in file:
-                    filename = file.rsplit("_")[:-1]
-                    filename = '_'.join(filename)
-                    if filename in cases_dict.keys():
-                        cases_dict[filename].update({'Mask': file})
-                    else:
-                        cases_dict[filename] = {'Mask': file}
-
-                elif file.endswith(".tif"):
-                    filename = file.rsplit(".")[:-1]
-                    # filename = file.rsplit("_")[:-1]
-                    filename = ''.join(filename)
-                    print(filename)
-                    if filename in cases_dict.keys():
-                        cases_dict[filename].update({'Image': file})
-                    else:
-                        cases_dict[filename] = {'Image': file}
-
-            if not cases_dict:
-                raise FileNotFoundError("Failed to import dataset.")
-                
-        return cases_dict
-
-
     def extract_features(self, cases, output_filepath):
         headers = None
 

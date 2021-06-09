@@ -1,8 +1,11 @@
+import os
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
 import imageio
+import skimage.io
+import glob
 
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path):
@@ -39,6 +42,7 @@ def histogram_equalization_2D(img, number_bins=256, display=False):
     # Look-up table with the information for what is the output pixel value for every input pixel value
     cdf = np.ma.filled(cdf_m,0).astype('uint8')
 
+    print(img)
     # Apply the transform
     image_equalized = cdf[img]
 
@@ -97,6 +101,73 @@ def histogram_equalization_3D(image, number_bins=256):
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
+
+
+def split_dataset(dataset_path):
+    dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+        
+    for dir in dirnames:
+        filenames = glob.glob(os.path.join(dir, "*.tif"))
+
+        for file in filenames:
+            # Avoid already preprocessed images and masks
+            if (not ("_pre-contrast"  in file or "_flair" in file or "_post-contrast" in file or "_mask" in file)):
+                img = skimage.io.imread(file)
+
+                filename = file.rsplit(".")[:-1]
+                filename = '.'.join(filename)
+                
+                precontrast_img = filename + '_pre-contrast.tif'
+                flair_img = filename + '_flair.tif'
+                postcontrast_img = filename + '_post-contrast.tif'
+
+                # Avoid creating again file if exists 
+                if not os.path.isfile(precontrast_img):
+                    skimage.io.imsave(precontrast_img, img[:,:,0])
+
+                if not os.path.isfile(flair_img):
+                    skimage.io.imsave(flair_img, img[:,:,1])
+
+                if not os.path.isfile(postcontrast_img):
+                    skimage.io.imsave(postcontrast_img, img[:,:,2])
+
+def get_dataset_as_object(dataset_path, contrast_type):
+        cases_dict = {}
+        dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+        
+        for dir in dirnames:
+            filenames = glob.glob(os.path.join(dir, "*.tif"))
+
+            for file in filenames:
+
+                if "_mask" in file:
+                    filename = file.rsplit("_")[:-1]
+                    filename = '_'.join(filename)
+                    filename = filename.rsplit("/")[2:]
+                    filename = ''.join(filename)
+                    
+                    if filename in cases_dict.keys():
+                        cases_dict[filename].update({'Mask': file})
+                    else:
+                        cases_dict[filename] = {'Mask': file}
+
+                elif file.endswith(contrast_type + ".tif"):
+                    filename = file.rsplit(".")[:-1]
+                    filename = ''.join(filename)
+                    filename = file.rsplit("_")[:-1]
+                    filename = '_'.join(filename)
+                    filename = filename.rsplit("/")[2:]
+                    filename = ''.join(filename)
+
+                    if filename in cases_dict.keys():
+                        cases_dict[filename].update({'Image': file})
+                    else:
+                        cases_dict[filename] = {'Image': file}
+
+            if not cases_dict:
+                raise FileNotFoundError("Failed to import dataset.")
+            
+        return cases_dict
 
 
 def remove_mask_from_image(img, mask):    
