@@ -6,4 +6,4 @@ matplotlib==3.4.2
 SimpleITK==2.0.2
 imageio==2.9.0
 nibabel==3.2.1
-pyqt5=5.15.4
+pyqt5==5.15.4
