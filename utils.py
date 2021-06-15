@@ -7,6 +7,7 @@ import imageio
 import skimage.io
 import nibabel as nib
 import glob
+import dicom2nifti
 
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
@@ -103,6 +104,7 @@ def histogram_equalization_3D(image, number_bins=256):
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
 
+
 def merge_slices_into_3D_image(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
         
@@ -150,6 +152,7 @@ def merge_slices_into_3D_image(dataset_path, contrast_type):
         # nib.save(mask, mask_name)
         imsave(mask_name, mask)
 
+
 def imsave(fname, arr):
     sitk_img = sitk.GetImageFromArray(arr, isVector=True)
     sitk.WriteImage(sitk_img, fname)
@@ -166,6 +169,7 @@ def imsave(fname, arr):
     # skimage.io.imsave(fname, arr, plugin='simpleitk')
 
     # skimage.io.imsave(fname, np.around(arr*255).astype(np.uint8), plugin='simpleitk')
+
 
 def split_dataset(dataset_path):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
@@ -245,30 +249,12 @@ def remove_mask_from_image(img, mask):
     return cv.bitwise_and(gray_img, gray_mask)
     
 
-def getCDF(img, display=None):
-    hist, bins = np.histogram(img.flatten(),256,[0,256])
-    # cdf: Cumulative Distribution Function
-    # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
-    cdf = hist.cumsum()
-    # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
-    cdf_normalized = cdf * hist.max()/ cdf.max()
+def remove_background(img_path):
+    dicom2nifti.dicom_series_to_nifti(img_path, "data/dataset/test/test_nifti.nii", reorient_nifti=False)
 
-    if display:
-        # Plot
-        plt.figure(1)
-
-        # Normalized CDF with red
-        plt.plot(cdf_normalized, color = 'r')
-
-        # Histogram with black
-        plt.hist(img.flatten(),256,[0,256], color = 'k')
-        plt.xlim([0,256])
-
-        # Place labels at the lower right of the plot 
-        plt.legend(('Normalized CDF','Histogram'), loc = 'lower right')
-        plt.show()
-
-    return cdf, bins
+    # Load a nifti as 3d numpy image [H, W, D]
+    nifti = nib.load("data/dataset/test/test_nifti.nii").get_fdata()
+    
 
 
 if __name__ == "__main__":
