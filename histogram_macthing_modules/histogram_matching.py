@@ -76,17 +76,21 @@ class HistogramMatcher:
         if len(target_img.shape) != len(reference_img.shape):
             raise ValueError("Target image shape must be the same as the reference image shape") # TODO: is this right?
 
-        # Histogram Equalization to the target image
-        if len(target_img.shape) == 3:  
-            target_image_equalized = utils.histogram_equalization_3D(target_img)
-        else:
-            target_image_equalized = utils.histogram_equalization_2D(target_img)
+        # Histogram Equalization to target image
+        # if len(target_img.shape) == 3:
+        #     target_image_equalized = utils.histogram_equalization_3D(target_img)
+        # else:
+        #     target_image_equalized = utils.histogram_equalization_2D(target_img)
 
-        # Histogram Equalization to the reference image
-        if len(reference_img.shape) == 3:    
-            reference_image_equalized = utils.histogram_equalization_3D(reference_img)
-        else:
-            reference_image_equalized = utils.histogram_equalization_2D(reference_img)
+        target_image_equalized = utils.histogram_equalization_CLAHE(target_img)
+
+        # Histogram Equalization to reference image
+        # if len(reference_img.shape) == 3:
+        #     reference_image_equalized = utils.histogram_equalization_3D(reference_img)
+        # else:
+        #     reference_image_equalized = utils.histogram_equalization_2D(reference_img)
+
+        reference_image_equalized = utils.histogram_equalization_CLAHE(reference_img)
 
         # Find the histogram of the reference image 
         reference_histogram = self.histogram_matcher.get_histogram(reference_image_equalized)

@@ -27,6 +27,18 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
     return dataset
 
 
+def histogram_equalization_CLAHE(img, number_bins=256, tile_grid_size=(32,32), clip_limit=2.0):
+    clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+
+    image = cv.resize(img, (200, 200), interpolation=cv.INTER_AREA)
+
+    clahe_image = clahe.apply(image)
+
+    # clahe_histograms = [cv.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
+
+    return clahe_image
+
+
 # Histogram Equalization Function
 # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
 def histogram_equalization_2D(img, number_bins=256, display=False):
