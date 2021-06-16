@@ -8,6 +8,7 @@ import skimage.io
 import napari
 import nibabel as nib
 import glob
+import dicom2nifti
 
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
@@ -247,81 +248,12 @@ def remove_mask_from_image(img, mask):
 
     return cv.bitwise_and(gray_img, gray_mask)
 
+def remove_background(img_path):
+    dicom2nifti.dicom_series_to_nifti(img_path, "data/dataset/test/test_nifti.nii", reorient_nifti=False)
 
-def getCDF(img, display=None):
-    hist, bins = np.histogram(img.flatten(), 256, [0, 256])
-    # cdf: Cumulative Distribution Function
-    # numpy.cumsum(): returns the cumulative sum of the elements along a given axis
-    cdf = hist.cumsum()
-    # Normalize to [0,255], as referenced in https://en.wikipedia.org/wiki/Histogram_equalization
-    cdf_normalized = cdf * hist.max() / cdf.max()
-
-    if display:
-        # Plot
-        plt.figure(1)
-
-        # Normalized CDF with red
-        plt.plot(cdf_normalized, color='r')
-
-        # Histogram with black
-        plt.hist(img.flatten(), 256, [0, 256], color='k')
-        plt.xlim([0, 256])
-
-        # Place labels at the lower right of the plot 
-        plt.legend(('Normalized CDF', 'Histogram'), loc='lower right')
-        plt.show()
-
-    return cdf, bins
-
-
-def convert_images_to_3d_numpy_arrays(base_path: str, mode: str, directories: list) -> dict:
-    """
-    Concatenates multiple 2D images to a 3D one
-    :param base_path: Base path for each patient
-    :param mode: .tif mode that you want to produce a 3D of
-    :param directories: Edw mpainei to stuff
-    :return: Returns a dictionary that has 'Key:Value' pairs of 'Name_Of_Folder:3D_Image'
-        3D Image is essentially a Numpy array
-    """
-    try:
-        # Concatenate every _pre-contrast.tif file
-        file_extension: str = f'*_{mode}.tif'
-        # Every 3D Image (numpy array) in a dictionary
-        images_in_3d = dict()
-
-        # Create a 3D Image from each folder/patient
-        for patient in directories:
-            # Define Dataset Path
-            images_path = os.path.join(base_path, patient, file_extension)
-            # Read all images from the path as an ImageCollection
-            im_collection: skimage.io.ImageCollection = skimage.io.ImageCollection(images_path)
-            # Each Value in the dictionary is a file
-            images_in_3d[patient] = im_collection.concatenate()
-
-        return images_in_3d
-
-    except Exception as e:
-        print(e.__str__())
-
-
-def display_3d_images(images: dict) -> None:
-    """
-    --- Runs properly only with Jupyter Notebook ---
-    --- napari library also requires pyqt5 library, which you install separately ---
-
-    Display the image for reference
-    It now prints only one image, for reference
-
-    :param images:
-    :return: None
-    """
-    try:
-        one_image = images['TCGA_CS_4941_19960909']
-        viewer = napari.view_image(one_image)
-        napari.run()
-
-    except Exception as e:
-        print(e.__str__())
+    # Load a nifti as 3d numpy image [H, W, D]
+    nifti = nib.load("data/dataset/test/test_nifti.nii").get_fdata()
+    
 
 
 if __name__ == "__main__":
