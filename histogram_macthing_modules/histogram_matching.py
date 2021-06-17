@@ -108,7 +108,7 @@ class HistogramMatcher:
         affine = img_with_correct_header.affine
         # header = img_with_correct_header.header
         hist_matched_img = np.rot90(hist_matched_img)
-        hist_matched_img = np.flip(hist_matched_img)
+        hist_matched_img = np.flipud(hist_matched_img)
 
         nib.Nifti1Image(hist_matched_img, affine).to_filename(os.path.join(new_dir, target_img_name))
         # skimage.io.imsave(os.path.join(new_dir, target_img_name), hist_matched_img)
