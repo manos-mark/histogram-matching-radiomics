@@ -53,7 +53,7 @@ class HistogramMatcher:
             target_img_path = target_img.split('/')[-2]
             target_img_name = target_img.split('/')[-1]
 
-            target_image = sitk.ReadImage(target_img)
+            target_img = skimage.io.imread(target_img)
         # Do nothing if variable is an image
         elif isinstance(target_img, np.ndarray):
             pass
@@ -63,52 +63,57 @@ class HistogramMatcher:
         # Checking if the value of the variable is a filepath or an image array 
         # Read Reference Image from the path
         if isinstance(reference_img, str):
-            reference_image = sitk.ReadImage(reference_img)
+            reference_img = skimage.io.imread(reference_img)
         # Do nothing if variable is an image
         elif isinstance(reference_img, np.ndarray):
             pass
         else:
             raise TypeError("Unkown file type: %{}".format(type(reference_img)))
 
-        # if len(target_img.shape) != len(reference_img.shape):
-        #     raise ValueError("Target image shape must be the same as the reference image shape")  # TODO: is this right?
+        if len(target_img.shape) != len(reference_img.shape):
+            raise ValueError("Target image shape must be the same as the reference image shape")  # TODO: is this right?
 
-        # # Histogram Equalization to target image
-        # if len(target_img.shape) == 3:
-        #     target_image_equalized = utils.histogram_equalization_3D(target_img)
-        # else:
-        #     target_image_equalized = utils.histogram_equalization_2D(target_img)
-        #
-        # # target_image_equalized = utils.histogram_equalization_CLAHE(target_img)
-        #
-        # # Histogram Equalization to reference image
-        # if len(reference_img.shape) == 3:
-        #     reference_image_equalized = utils.histogram_equalization_3D(reference_img)
-        # else:
-        #     reference_image_equalized = utils.histogram_equalization_2D(reference_img)
-        #
-        # # reference_image_equalized = utils.histogram_equalization_CLAHE(reference_img)
-        #
-        # # Find the histogram of the reference image
-        # reference_histogram = self.histogram_matcher.get_histogram(reference_image_equalized)
-        #
-        # # Match target image to the reference histogram
-        # hist_matched_img = self.histogram_matcher.match_image_to_histogram(target_image_equalized, reference_histogram)
-        #
-        # # Result image
-        # hist_matched_img = np.uint8(hist_matched_img)
+        # Histogram Equalization to target image
+        if len(target_img.shape) == 3:
+            target_image_equalized = utils.histogram_equalization_3D(target_img)
+        else:
+            target_image_equalized = utils.histogram_equalization_2D(target_img)
 
-        hist_matched_img = sitk.HistogramMatching(target_image, reference_image)
+        # target_image_equalized = utils.histogram_equalization_CLAHE(target_img)
+
+        # Histogram Equalization to reference image
+        if len(reference_img.shape) == 3:
+            reference_image_equalized = utils.histogram_equalization_3D(reference_img)
+        else:
+            reference_image_equalized = utils.histogram_equalization_2D(reference_img)
+
+        # reference_image_equalized = utils.histogram_equalization_CLAHE(reference_img)
+
+        # Find the histogram of the reference image
+        reference_histogram = self.histogram_matcher.get_histogram(reference_image_equalized)
+
+        # Match target image to the reference histogram
+        hist_matched_img = self.histogram_matcher.match_image_to_histogram(target_image_equalized, reference_histogram)
+
+        # Result image
+        hist_matched_img = np.uint8(hist_matched_img)
 
         new_dir = os.path.join(self.output_path, target_img_path)
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
+
+        correct_headers_path = os.path.join('data', 'correct_headers')
+        correct_headers_nifti_path = os.path.join(correct_headers_path, 'img_with_correct_header.nii')
+        img_with_correct_header = nib.load(correct_headers_nifti_path)
+        affine = img_with_correct_header.affine
+        # header = img_with_correct_header.header
+        hist_matched_img = np.rot90(hist_matched_img)
+        hist_matched_img = np.flip(hist_matched_img)
+
+        nib.Nifti1Image(hist_matched_img, affine).to_filename(os.path.join(new_dir, target_img_name))
         # skimage.io.imsave(os.path.join(new_dir, target_img_name), hist_matched_img)
-        sitk.WriteImage(hist_matched_img, os.path.join(new_dir, target_img_name))
 
         if display:
-            # https://simpleitk.org/SimpleITK-Notebooks/10_matplotlib%27s_imshow.html
-
             # Plot
             # Pseudocolor used, which is only relevant to single-channel, grayscale, luminosity images.
             # It can be a useful tool for enhancing contrast and visualizing data more easily
@@ -120,28 +125,25 @@ class HistogramMatcher:
             # Target Image
             subplot = figure3.add_subplot(321)
             subplot.set_title('Target Image Equalized')
-            target_image = nib.load(target_img).get_data()
-            plt.imshow(np.array(target_image, np.int32), cmap='gray')
+            plt.imshow(np.array(target_image_equalized, np.int32), cmap='gray')
 
             # Target Image Histogram
             subplot = figure3.add_subplot(322)
             subplot.set_title('Target Image Histogram')
-            plt.hist(target_image.flatten(), 256, [0, 256])
+            plt.hist(target_image_equalized.flatten(), 256, [0, 256])
 
             # Reference Image
             subplot = figure3.add_subplot(323)
             subplot.set_title('Reference Image Equalized')
-            reference_image = skimage.io.imread(reference_img)
-            plt.imshow(np.array(reference_image, np.int32), cmap='gray')
+            plt.imshow(np.array(reference_image_equalized, np.int32), cmap='gray')
 
             # Reference Image Histogram
             subplot = figure3.add_subplot(324)
             subplot.set_title('Reference Image Histogram')
-            plt.hist(reference_image.flatten(), 256, [0, 256])
+            plt.hist(reference_image_equalized.flatten(), 256, [0, 256])
 
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(325)
-            hist_matched_img = skimage.io.imread(os.path.join(new_dir, target_img_name))
             plt.imshow(np.array(hist_matched_img, np.int32), cmap='gray')
 
             subplot.set_title('Image Matched to Histogram')
