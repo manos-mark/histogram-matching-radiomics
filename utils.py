@@ -7,8 +7,10 @@ import imageio
 import skimage.io
 import napari
 import nibabel as nib
+from pyrobex.robex import robex
 import glob
 import dicom2nifti
+from PIL import Image
 
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
@@ -28,6 +30,7 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
 
 
 def histogram_equalization_CLAHE(img, number_bins=256, tile_grid_size=(32,32), clip_limit=2.0):
+    print(img)
     clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
 
     image = cv.resize(img, (200, 200), interpolation=cv.INTER_AREA)
@@ -89,7 +92,7 @@ def histogram_equalization_3D(image, number_bins=256):
 
         # from http://www.janeriksolem.net/2009/06/histogram-equalization-with-python-and.html
         # get image histogram
-        hist, bins = np.histogram(img.flatten(), number_bins)  # , [0,256])
+        hist, bins = np.histogram(img.flatten(), number_bins, density=True)  # , [0,256])
         cdf = hist.cumsum()  # cumulative distribution function
         cdf = cdf * hist.max() / cdf.max()  # 255 * cdf / cdf[-1] # normalize
 
@@ -114,73 +117,67 @@ def histogram_equalization_3D(image, number_bins=256):
     return image_equalized
 
 
-def rgb2gray(rgb):
-    return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+def split_filename(filepath):
+    path = os.path.dirname(filepath)
+    filename = os.path.basename(filepath)
+    base, ext = os.path.splitext(filename)
+    if ext == '.gz':
+        base, ext2 = os.path.splitext(base)
+        ext = ext2 + ext
+    return path, base, ext
+
+
+def tiff_to_nii(images, out_dir, contrast_type, axis=2):
+    try:
+        correct_headers_path = os.path.join('data', 'correct_headers')
+        correct_headers_nifti_path = os.path.join(correct_headers_path, 'img_with_correct_header.nii')
+
+        dicom2nifti.dicom_series_to_nifti(correct_headers_path, correct_headers_nifti_path, reorient_nifti=False)
+
+        img_with_correct_header = nib.load(correct_headers_nifti_path)
+        affine = img_with_correct_header.affine
+        header = img_with_correct_header.header
+
+        fns = sorted(images)
+        imgs = []
+        for fn in fns:
+            _, base, ext = split_filename(fn)
+            if 'mask' in base:
+                base = base.split('_')[:-2]
+                base.append('mask')
+                base = '_'.join(base)
+
+            else:
+                base = base.split('_')[:-2]
+                base.append(contrast_type)
+                base = '_'.join(base)
+
+            img = np.asarray(Image.open(fn)).astype(np.float32).squeeze()
+            img = np.rot90(img)
+
+            if img.ndim != 2:
+                raise Exception(f'Only 2D data supported. File {base}{ext} has dimension {img.ndim}.')
+            imgs.append(img)
+        img = np.stack(imgs, axis=axis)
+        nib.Nifti1Image(img, affine, header).to_filename(os.path.join(out_dir, f'{base}.nii'))
+        return 0
+    except Exception as e:
+        print(e)
+        return 1
 
 
 def merge_slices_into_3D_image(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
     for dir in dirnames:
-        filenames = glob.glob(os.path.join(dir, "*.tif"))
-        first_dimension = second_dimension = third_dimension = 0
+        filenames = glob.glob(os.path.join(dir, '*_'+contrast_type+'.tif'))
+        masknames = glob.glob(os.path.join(dir, "*_mask.tif"))
 
-        # Count the number of slices and get the shape of the image
-        # to initialize the dimensions in order to initialize 
-        # the following arrays (mask and image representing the 3D images)
-        for file in filenames:
-            if "_mask" in file:
-                third_dimension += 1
-            # Execute this only once
-            if first_dimension == 0:
-                first_dimension = second_dimension = skimage.io.imread(file).shape[0]
+        if not filenames or not masknames:
+            raise ValueError(f'dir ({dir}) does not contain any .tif or .tiff images.')
 
-        mask = np.zeros([first_dimension, second_dimension, third_dimension], dtype=np.uint8)
-        image = np.zeros([first_dimension, second_dimension, third_dimension], dtype=np.uint8)
-
-        for file in filenames:
-            i = j = 0
-            # Avoid already preprocessed images
-            if "_mask" in file:
-                mask[:, :, i] = skimage.io.imread(file)
-                i += 1
-            elif contrast_type in file:
-                image[:, :, j] = skimage.io.imread(file)
-                j += 1
-
-        image_name = file.rsplit(".")[:-1]
-        image_name = '.'.join(image_name)
-        image_name = image_name + '_' + contrast_type + '-3D.nii'
-
-        # image = nib.Nifti1Image(image, affine=np.eye(4))
-        # nib.save(image, image_name)
-        imsave(image_name, image)
-
-        mask_name = file.rsplit(".")[:-1]
-        mask_name = '.'.join(mask_name)
-        mask_name = mask_name + '_' + contrast_type + '-3D_mask.nii'
-
-        # mask = nib.Nifti1Image(mask, affine=np.eye(4))
-        # nib.save(mask, mask_name)
-        imsave(mask_name, mask)
-
-
-def imsave(fname, arr):
-    sitk_img = sitk.GetImageFromArray(arr, isVector=True)
-    sitk.WriteImage(sitk_img, fname)
-
-    # sitk_img = sitk.GetImageFromArray(np.around(arr*255).astype(np.uint8), isVector=True)
-    # sitk.WriteImage(sitk_img, fname)
-
-    # plt.imsave(fname, arr, cmap='gray')
-
-    # plt.imsave(fname, np.around(arr*255).astype(np.uint8), cmap='gray')
-
-    # skimage.io.imsave(fname, arr)
-
-    # skimage.io.imsave(fname, arr, plugin='simpleitk')
-
-    # skimage.io.imsave(fname, np.around(arr*255).astype(np.uint8), plugin='simpleitk')
+        tiff_to_nii(filenames, dir, contrast_type)
+        tiff_to_nii(masknames, dir, contrast_type)
 
 
 def split_dataset(dataset_path):
@@ -191,7 +188,7 @@ def split_dataset(dataset_path):
 
         for file in filenames:
             # Avoid already preprocessed images and masks
-            if (not ("_pre-contrast" in file or "_flair" in file or "_post-contrast" in file or "_mask" in file)):
+            if not ("_pre-contrast" in file or "_flair" in file or "_post-contrast" in file or "_mask" in file):
                 img = skimage.io.imread(file)
 
                 filename = file.rsplit(".")[:-1]
@@ -217,7 +214,7 @@ def get_dataset_as_object(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
     for dir in dirnames:
-        filenames = glob.glob(os.path.join(dir, "*.tif"))
+        filenames = glob.glob(os.path.join(dir, "*.nii"))
 
         for file in filenames:
 
@@ -232,7 +229,7 @@ def get_dataset_as_object(dataset_path, contrast_type):
                 else:
                     cases_dict[filename] = {'Mask': file}
 
-            elif file.endswith(contrast_type + ".tif"):
+            elif file.endswith(contrast_type + ".nii"):
                 filename = file.rsplit(".")[:-1]
                 filename = ''.join(filename)
                 filename = file.rsplit("_")[:-1]
@@ -260,12 +257,19 @@ def remove_mask_from_image(img, mask):
 
     return cv.bitwise_and(gray_img, gray_mask)
 
-def remove_background(img_path):
-    dicom2nifti.dicom_series_to_nifti(img_path, "data/dataset/test/test_nifti.nii", reorient_nifti=False)
 
-    # Load a nifti as 3d numpy image [H, W, D]
-    nifti = nib.load("data/dataset/test/test_nifti.nii").get_fdata()
-    
+def remove_background(dataset_path, constrast_type):
+    dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+
+    for dir in dirnames:
+        filename = glob.glob(os.path.join(dir, '*' + constrast_type + '.nii'))[0].split("/")[-1]
+
+        # Load a nifti as 3d numpy image [H, W, D]
+        print("Skull extraction for image: ", os.path.join(filename))
+        image = nib.load(os.path.join(dir, filename))
+        stripped, mask = robex(image)
+
+        nib.save(stripped, os.path.join(dir, filename))
 
 def convert_images_to_3d_numpy_arrays(base_path: str, mode: str, directories: list) -> dict:
     """
