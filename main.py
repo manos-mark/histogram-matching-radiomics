@@ -15,20 +15,24 @@ def main():
     # It creates new images increasing time and resources consumption
     utils.split_dataset(DATASET_PATH)
 
-    # utils.merge_slices_into_3D_image(DATASET_PATH, 'pre-contrast')
+    # Disable this for faster Debugging
+    # utils.merge_slices_into_3D_image(DATASET_PATH, 'flair')
+    #
+    # # Disable this for faster Debugging
+    # utils.remove_background(DATASET_PATH, 'flair')
 
     # Prepare dataset for pyradiomics extractor
     # Getting the dataset's path, returns an object specifing for each patient the images and segmentations
-    pre_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'pre-contrast')  # pre-contrast-3D
+    # pre_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'pre-contrast')  # pre-contrast-3D
     flair_dataset = utils.get_dataset_as_object(DATASET_PATH, 'flair')
-    post_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'post-contrast')
+    # post_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'post-contrast')
 
     # Get the filepaths from the images only (without the segmentations) as a list
-    pre_contrast_images = [value['Image'] for value in pre_contrast_dataset.values()]
+    # pre_contrast_images = [value['Image'] for value in pre_contrast_dataset.values()]
     flair_images = [value['Image'] for value in flair_dataset.values()]
-    post_contrast_images = [value['Image'] for value in post_contrast_dataset.values()]
+    # post_contrast_images = [value['Image'] for value in post_contrast_dataset.values()]
 
-    utils.remove_background("data/dataset/test/")
+
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
 
@@ -36,7 +40,7 @@ def main():
     feature_extractor = FeatureExtractor(PARAMETERS_PATH)
 
     # Execute batch processing to extract features
-    # feature_extractor.extract_features(post_contrast_dataset, FEATURES_OUTPUT_PATH)
+    feature_extractor.extract_features(flair_dataset, FEATURES_OUTPUT_PATH)
 
 
     # ######################################################################################################
@@ -49,7 +53,7 @@ def main():
     # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
     # Perform Batch histogram matching
-    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[4], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    histogram_matcher.match_histograms(flair_images, flair_images[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
