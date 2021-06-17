@@ -10,3 +10,4 @@ pyqt5==5.15.4
 pykwalify==1.7.0
 pyradiomics==3.0.1
 dicom2nifti==2.3.0
+pyrobex==0.4.2

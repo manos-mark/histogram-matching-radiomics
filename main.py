@@ -49,7 +49,7 @@ def main():
     # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
     # Perform Batch histogram matching
-    histogram_matcher.match_histograms(flair_images, flair_images[4], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[4], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
@@ -81,8 +81,8 @@ def main():
     ]
 
     # Concatenate Images
-    img_list_3d: dict = utils.convert_images_to_3d_numpy_arrays(base_path=DATASET_PATH, mode='pre-contrast',
-                                                                directories=dirs)
+    # img_list_3d: dict = utils.convert_images_to_3d_numpy_arrays(base_path=DATASET_PATH, mode='pre-contrast',
+    #                                                             directories=dirs)
 
     # Display Images -- ONLY FOR JUPYTER NOTEBOOK ! --
     # display_3d_images(img_list_3d)

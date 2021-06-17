@@ -7,6 +7,7 @@ import imageio
 import skimage.io
 import napari
 import nibabel as nib
+from pyrobex.robex import robex
 import glob
 import dicom2nifti
 
@@ -260,12 +261,15 @@ def remove_mask_from_image(img, mask):
 
     return cv.bitwise_and(gray_img, gray_mask)
 
+
 def remove_background(img_path):
     dicom2nifti.dicom_series_to_nifti(img_path, "data/dataset/test/test_nifti.nii", reorient_nifti=False)
 
     # Load a nifti as 3d numpy image [H, W, D]
-    nifti = nib.load("data/dataset/test/test_nifti.nii").get_fdata()
-    
+    image = nib.load("data/dataset/test/test_nifti.nii")
+    stripped, mask = robex(image)
+
+    nib.save(stripped, 'result.nii')
 
 
 if __name__ == "__main__":
