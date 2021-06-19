@@ -29,7 +29,7 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
     return dataset
 
 
-def histogram_equalization_CLAHE(img, number_bins=256, tile_grid_size=(32,32), clip_limit=2.0):
+def histogram_equalization_CLAHE(img, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
     print(img)
     clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
 
@@ -170,7 +170,7 @@ def merge_slices_into_3D_image(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
     for dir in dirnames:
-        filenames = glob.glob(os.path.join(dir, '*_'+contrast_type+'.tif'))
+        filenames = glob.glob(os.path.join(dir, '*_' + contrast_type + '.tif'))
         masknames = glob.glob(os.path.join(dir, "*_mask.tif"))
 
         if not filenames or not masknames:
@@ -266,10 +266,11 @@ def remove_background(dataset_path, constrast_type):
 
         # Load a nifti as 3d numpy image [H, W, D]
         print("Skull extraction for image: ", os.path.join(filename))
-        image = nib.load(os.path.join(dir, filename))
+        image = nib.load(os.path.join(filename))
         stripped, mask = robex(image)
 
         nib.save(stripped, os.path.join(dir, filename))
+
 
 def convert_images_to_3d_numpy_arrays(base_path: str, mode: str, directories: list) -> dict:
     """
