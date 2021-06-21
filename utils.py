@@ -322,6 +322,71 @@ def display_3d_images(images: dict) -> None:
         print(e.__str__())
 
 
+def evaluate_processed_images(dataset_path) -> None:
+    """
+    Rates the contrast of images
+
+    :param stuff:
+    :return:
+    """
+    dirnames: str = glob.glob(os.path.join(dataset_path, "*", ""))
+    best_post_constrast_image: dict = {
+        'slice': str,
+        'contrast_score': 0.0
+    }
+
+    for dir in dirnames:
+        filenames = glob.glob(os.path.join(dir, "*.tif"))
+
+        for file in filenames:
+            # Avoid already preprocessed images and masks
+            if "_post-contrast" in file:
+                # load images as grayscale
+                img = cv.imread(file, 0)
+                # img = cv2.imread("TCGA_CS_4941_19960909_11_post-contrast.tif", 0)
+                hh, ww = img.shape[:2]
+
+                # compute total pixels
+                tot = hh * ww
+
+                # compute histogram
+                hist = np.histogram(img, bins=256, range=[0, 255])[0]
+
+                # compute cumulative histogram
+                cum = np.cumsum(hist)
+
+                # normalize histogram to range 0 to 100
+                cum = 100 * cum / tot
+
+                # get bins of percentile at 25 and 75 percent in cum histogram
+                i = 0
+                while cum[i] < 25:
+                    i = i + 1
+                B1 = i
+                i = 0
+                while cum[i] < 75:
+                    i = i + 1
+                B3 = i
+                # print('25 and 75 percentile bins:', B1, B3)
+
+                # compute min and max graylevel (which are also the min and max bins)
+                min = np.amin(img)
+                max = np.amax(img)
+                # print('min:', min, 'max:', max)
+
+                # compute contrast
+                contrast = (B3 - B1) / (max - min)
+                # print('contrast:', contrast)
+
+                if contrast > best_post_constrast_image.get('contrast_score'):
+                    best_post_constrast_image['slice'] = file
+                    best_post_constrast_image['contrast_score'] = contrast
+
+    print(f"The best post-contrast image is from:"
+          f"\nSlice - {best_post_constrast_image['slice']}"
+          f"\nContrast Score: {best_post_constrast_image['contrast_score']}")
+
+
 if __name__ == "__main__":
     image_path = 'data/dataset/R01-001.nii'
     mask_path = 'data/dataset/R01-001_roi.nii'
