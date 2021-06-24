@@ -159,7 +159,7 @@ def single_tiff_to_nii(filenames,out_dir,contrast_type,axis=2) :
                 raise Exception(f'Only 2D data supported. File {base}{ext} has dimension {img.ndim}.')
             imgs.append(img)
             img = np.stack(imgs, axis=axis)
-            nib.Nifti1Image(img, affine, header).to_filename(os.path.join(out_dir, f'{base}_single.nii'))
+            nib.Nifti1Image(img, affine, header).to_filename(os.path.join(out_dir, f'{base}.nii'))
         return 0
     except Exception as e:
         print(e)
