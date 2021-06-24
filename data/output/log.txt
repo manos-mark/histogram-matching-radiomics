@@ -1,0 +1,69 @@
+
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_2_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_2_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_3_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_3_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_4_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_4_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_5_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_5_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_10_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_10_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_1_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_1_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_2_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_2_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_3_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_3_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_4_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_4_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_5_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_5_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_6_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_6_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_7_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_7_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_8_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_8_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_9_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_9_post-contrast.nii
+
+REFERENCE: ./data/dataset/TCGA_FG_6688_20020215/TCGA_FG_6688_20020215_1_post-contrast.nii 
+INPUT: ./data/dataset/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_post-contrast.nii 
+OUTPUT: ./data/output/TCGA_FG_6689_20020326/TCGA_FG_6689_20020326_post-contrast.nii
