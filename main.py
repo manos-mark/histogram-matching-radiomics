@@ -19,10 +19,10 @@ def main():
     utils.merge_slices_into_3D_image(DATASET_PATH, 'post-contrast')
     #
     # # Disable this for faster Debugging
-    utils.remove_background(DATASET_PATH, 'post-contrast')
+    utils.extract_brain(DATASET_PATH, 'post-contrast')
 
     # SINGLE POST CONTRAST IMAGE NII - EXTRACTION
-    utils.getSingleImageNii(DATASET_PATH, 'post-contrast')
+    utils.convert_slice_to_nifti(DATASET_PATH, 'post-contrast')
 
     # Prepare dataset for pyradiomics extractor
     # Getting the dataset's path, returns an object specifing for each patient the images and segmentations

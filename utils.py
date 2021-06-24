@@ -218,7 +218,7 @@ def merge_slices_into_3D_image(dataset_path, contrast_type):
         tiff_to_nii(filenames, dir, contrast_type)
         tiff_to_nii(masknames, dir, contrast_type)
 
-def getSingleImageNii(dataset_path, contrast_type):
+def convert_slice_to_nifti(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
     for dir in dirnames:
@@ -308,18 +308,18 @@ def remove_mask_from_image(img, mask):
     return cv.bitwise_and(gray_img, gray_mask)
 
 
-def remove_background(dataset_path, constrast_type):
+def extract_brain(dataset_path, constrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
-    for dir in dirnames:
-        filename = glob.glob(os.path.join(dir, '*' + constrast_type + '.nii'))[0].split("/")[-1]
+    for directory in dirnames:
+        filename = glob.glob(os.path.join(directory, '*' + constrast_type + '.nii'))[0].split("/")[-1]
 
         # Load a nifti as 3d numpy image [H, W, D]
         print("Skull extraction for image: ", os.path.join(filename))
-        image = nib.load(os.path.join(filename))
+        image = nib.load(os.path.join(directory, filename))
         stripped, mask = robex(image)
 
-        nib.save(stripped, os.path.join(dir, filename))
+        nib.save(stripped, os.path.join(directory, filename))
 
 
 def convert_images_to_3d_numpy_arrays(base_path: str, mode: str, directories: list) -> dict:
