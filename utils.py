@@ -127,6 +127,45 @@ def split_filename(filepath):
     return path, base, ext
 
 
+def single_tiff_to_nii(filenames,out_dir,contrast_type,axis=2) :
+    try:
+        correct_headers_path = os.path.join('data', 'correct_headers')
+        correct_headers_nifti_path = os.path.join(correct_headers_path, 'img_with_correct_header.nii')
+
+        dicom2nifti.dicom_series_to_nifti(correct_headers_path, correct_headers_nifti_path, reorient_nifti=False)
+
+        img_with_correct_header = nib.load(correct_headers_nifti_path)
+        affine = img_with_correct_header.affine
+        header = img_with_correct_header.header
+
+        fns = sorted(filenames)
+        for fn in fns:
+            imgs = []
+            _, base, ext = split_filename(fn)
+            if 'mask' in base:
+                base = base.split('_')[:-1]
+                base.append('mask')
+                base = '_'.join(base)
+
+            else:
+                base = base.split('_')[:-1]
+                base.append(contrast_type)
+                base = '_'.join(base)
+
+            img = np.asarray(Image.open(fn)).astype(np.float32).squeeze()
+            img = np.rot90(img)
+
+            if img.ndim != 2:
+                raise Exception(f'Only 2D data supported. File {base}{ext} has dimension {img.ndim}.')
+            imgs.append(img)
+            img = np.stack(imgs, axis=axis)
+            nib.Nifti1Image(img, affine, header).to_filename(os.path.join(out_dir, f'{base}_single.nii'))
+        return 0
+    except Exception as e:
+        print(e)
+        return 1
+
+
 def tiff_to_nii(images, out_dir, contrast_type, axis=2):
     try:
         correct_headers_path = os.path.join('data', 'correct_headers')
