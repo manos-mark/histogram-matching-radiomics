@@ -218,6 +218,17 @@ def merge_slices_into_3D_image(dataset_path, contrast_type):
         tiff_to_nii(filenames, dir, contrast_type)
         tiff_to_nii(masknames, dir, contrast_type)
 
+def getSingleImageNii(dataset_path, contrast_type):
+    dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
+
+    for dir in dirnames:
+        filenames = glob.glob(os.path.join(dir, '*_' + contrast_type + '.tif'))
+
+        if not filenames:
+            raise ValueError(f'dir ({dir}) does not contain any .tif or .tiff images.')
+
+        single_tiff_to_nii(filenames, dir, contrast_type)
+
 
 def split_dataset(dataset_path):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
