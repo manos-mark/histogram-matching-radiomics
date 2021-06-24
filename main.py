@@ -21,6 +21,9 @@ def main():
     # # Disable this for faster Debugging
     utils.remove_background(DATASET_PATH, 'post-contrast')
 
+    # SINGLE POST CONTRAST IMAGE NII - EXTRACTION
+    utils.getSingleImageNii(DATASET_PATH, 'post-contrast')
+
     # Prepare dataset for pyradiomics extractor
     # Getting the dataset's path, returns an object specifing for each patient the images and segmentations
     # pre_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'pre-contrast')  # pre-contrast-3D
