@@ -21,7 +21,6 @@ def main():
     # SINGLE POST CONTRAST IMAGE NIFTI - EXTRACTION
     utils.convert_slice_to_nifti(DATASET_PATH, 'post-contrast')
 
-
     # Disable this for faster Debugging
     utils.extract_brain(DATASET_PATH, 'post-contrast')
 
