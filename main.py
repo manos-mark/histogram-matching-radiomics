@@ -48,13 +48,13 @@ def main():
     # ######################################### HISTOGRAM MATCHING #########################################
 
     # Initialize HistogramMatcher & select histogram matching method
-    # histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
+    histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
     # Perform histogram matching
     # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
     # Perform Batch histogram matching
-    # histogram_matcher.match_histograms(flair_images, flair_images[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################

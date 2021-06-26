@@ -52,8 +52,9 @@ class HistogramMatcher:
         if isinstance(target_img, str):
             target_img_path = target_img.split('/')[-2]
             target_img_name = target_img.split('/')[-1]
+            reference_img_name = reference_img.split('/')[-1]
 
-            target_img = skimage.io.imread(target_img)
+            target_image = skimage.io.imread(target_img)
         # Do nothing if variable is an image
         elif isinstance(target_img, np.ndarray):
             pass
@@ -63,29 +64,54 @@ class HistogramMatcher:
         # Checking if the value of the variable is a filepath or an image array 
         # Read Reference Image from the path
         if isinstance(reference_img, str):
-            reference_img = skimage.io.imread(reference_img)
+            reference_image = skimage.io.imread(reference_img)
         # Do nothing if variable is an image
         elif isinstance(reference_img, np.ndarray):
             pass
         else:
             raise TypeError("Unkown file type: %{}".format(type(reference_img)))
 
-        if len(target_img.shape) != len(reference_img.shape):
+        if len(target_image.shape) != len(reference_image.shape):
             raise ValueError("Target image shape must be the same as the reference image shape")  # TODO: is this right?
 
+        # Find masks from image paths
+        target_img_mask_path = target_img.split('/')[:-1]
+        target_img_mask_path = '/'.join(target_img_mask_path)
+        img_name = target_img_name.split('_')[:-1]
+        img_name = '_'.join(img_name)
+        target_img_mask_path = target_img_mask_path + '/' + img_name + "_mask.nii"
+
+        reference_img_mask_path = reference_img.split('/')[:-1]
+        reference_img_mask_path = '/'.join(reference_img_mask_path)
+        img_name = reference_img_name.split('_')[:-1]
+        img_name = '_'.join(img_name)
+        reference_img_mask_path = reference_img_mask_path + '/' + img_name + "_mask.nii"
+
+        if not os.path.isfile(target_img_mask_path):
+            raise FileNotFoundError("File " + target_img_mask_path + " not found!")
+
+        if not os.path.isfile(reference_img_mask_path):
+            raise FileNotFoundError("File " + reference_img_mask_path + " not found!")
+
+        # Read masks
+        target_image_mask = skimage.io.imread(target_img_mask_path)
+        reference_image_mask = skimage.io.imread(reference_img_mask_path)
+
         # Histogram Equalization to target image
-        if len(target_img.shape) == 3:
-            target_image_equalized = utils.histogram_equalization_3D(target_img)
+        if len(target_image.shape) == 3:
+            target_image_unmasked = utils.remove_mask_from_image(target_image, target_image_mask)
+            target_image_equalized = utils.histogram_equalization_3D(target_image_unmasked)
         else:
             target_image_equalized = utils.histogram_equalization_2D(target_img)
 
         # target_image_equalized = utils.histogram_equalization_CLAHE(target_img)
 
         # Histogram Equalization to reference image
-        if len(reference_img.shape) == 3:
-            reference_image_equalized = utils.histogram_equalization_3D(reference_img)
+        if len(reference_image.shape) == 3:
+            reference_image_unmasked = utils.remove_mask_from_image(reference_image, reference_image_mask)
+            reference_image_equalized = utils.histogram_equalization_3D(reference_image_unmasked)
         else:
-            reference_image_equalized = utils.histogram_equalization_2D(reference_img)
+            reference_image_equalized = utils.histogram_equalization_2D(reference_image)
 
         # reference_image_equalized = utils.histogram_equalization_CLAHE(reference_img)
 
@@ -107,8 +133,8 @@ class HistogramMatcher:
         img_with_correct_header = nib.load(correct_headers_nifti_path)
         affine = img_with_correct_header.affine
         # header = img_with_correct_header.header
-        hist_matched_img = np.rot90(hist_matched_img)
-        hist_matched_img = np.flipud(hist_matched_img)
+        # hist_matched_img = np.rot90(hist_matched_img)
+        # hist_matched_img = np.flipud(hist_matched_img)
 
         nib.Nifti1Image(hist_matched_img, affine).to_filename(os.path.join(new_dir, target_img_name))
         # skimage.io.imsave(os.path.join(new_dir, target_img_name), hist_matched_img)
@@ -125,7 +151,7 @@ class HistogramMatcher:
             # Target Image
             subplot = figure3.add_subplot(321)
             subplot.set_title('Target Image Equalized')
-            plt.imshow(np.array(target_image_equalized, np.int32), cmap='gray')
+            plt.imshow(np.array(target_image_equalized[:, :, 0], np.int32), cmap='gray')
 
             # Target Image Histogram
             subplot = figure3.add_subplot(322)
@@ -135,7 +161,7 @@ class HistogramMatcher:
             # Reference Image
             subplot = figure3.add_subplot(323)
             subplot.set_title('Reference Image Equalized')
-            plt.imshow(np.array(reference_image_equalized, np.int32), cmap='gray')
+            plt.imshow(np.array(reference_image_equalized[:, :, 0], np.int32), cmap='gray')
 
             # Reference Image Histogram
             subplot = figure3.add_subplot(324)
@@ -144,7 +170,7 @@ class HistogramMatcher:
 
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(325)
-            plt.imshow(np.array(hist_matched_img, np.int32), cmap='gray')
+            plt.imshow(np.array(hist_matched_img[:, :, 0], np.int32), cmap='gray')
 
             subplot.set_title('Image Matched to Histogram')
 

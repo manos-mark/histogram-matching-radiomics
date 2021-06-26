@@ -11,7 +11,7 @@ from pyrobex.robex import robex
 import glob
 import dicom2nifti
 from PIL import Image
-
+from skimage.color import rgb2gray
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
@@ -127,7 +127,7 @@ def split_filename(filepath):
     return path, base, ext
 
 
-def single_tiff_to_nii(filenames,out_dir,contrast_type,axis=2) :
+def single_tiff_to_nii(filenames, out_dir, contrast_type, axis=2):
     try:
         correct_headers_path = os.path.join('data', 'correct_headers')
         correct_headers_nifti_path = os.path.join(correct_headers_path, 'img_with_correct_header.nii')
@@ -218,6 +218,7 @@ def merge_slices_into_3D_image(dataset_path, contrast_type):
         tiff_to_nii(filenames, dir, contrast_type)
         tiff_to_nii(masknames, dir, contrast_type)
 
+
 def convert_slice_to_nifti(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
@@ -298,14 +299,30 @@ def get_dataset_as_object(dataset_path, contrast_type):
     return cases_dict
 
 
-def remove_mask_from_image(img, mask):
-    gray_img = rgb2gray(img)
-    gray_mask = rgb2gray(mask)
+def remove_mask_from_image(img, mask, display=False):
+    slices = np.zeros_like(img)
 
-    # blank = np.zeros(img.shape[:2], dtype='uint8')
-    # mask = ~cv.circle(blank, (img.shape[1]//2, img.shape[0]//2), 100, 255, -1)
+    for i in range(img.shape[2]):
+        gray_img = rgb2gray(img)
+        gray_mask = rgb2gray(mask)
 
-    return cv.bitwise_and(gray_img, gray_mask)
+        extracted_image = cv.bitwise_xor(gray_img, gray_mask)
+
+        slices[:, :, i] = extracted_image
+
+        if display:
+            fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+            ax = axes.ravel()
+
+            ax[0].imshow(gray_img, cmap=plt.cm.gray)
+            ax[0].set_title("Original")
+            ax[1].imshow(extracted_image, cmap=plt.cm.gray)
+            ax[1].set_title("Extracted")
+
+            fig.tight_layout()
+            plt.show()
+
+    return slices
 
 
 def extract_brain(dataset_path, constrast_type):
@@ -436,48 +453,3 @@ def evaluate_processed_images(dataset_path) -> None:
           f"\nSlice - {best_post_constrast_image['slice']}"
           f"\nContrast Score: {best_post_constrast_image['contrast_score']}")
 
-
-if __name__ == "__main__":
-    image_path = 'data/dataset/R01-001.nii'
-    mask_path = 'data/dataset/R01-001_roi.nii'
-
-    # image = sitk.ReadImage(image_path)
-    # image = sitk.GetArrayFromImage(image)
-
-    # mask = sitk.ReadImage(mask_path)
-    # mask = sitk.GetArrayFromImage(mask)
-    image = imageio.imread(image_path)
-
-    mask = imageio.imread(mask_path)
-
-    plt.figure(figsize=(20, 20))
-
-    plt.subplot(2, 2, 1)
-    plt.imshow(image[12, :, :], cmap="gray")
-    plt.title("Brain")
-
-    plt.subplot(2, 2, 2)
-    plt.imshow(mask[12, :, :], cmap="gray")
-    plt.title("Segmentation")
-
-    masked_image = np.zeros(image.shape)
-    for i in range(image.shape[0]):
-        img = image[i, :, :]
-        msk = mask[i, :, :]
-        masked_image[i, :, :] = remove_mask_from_image(img, msk)
-
-    plt.subplot(2, 2, 3)
-    plt.imshow(masked_image[12, :, :], cmap='gray')
-    plt.title("Masked Image")
-
-    plt.subplot(2, 2, 4)
-    plt.title('Graylevel Histogram')
-    plt.xlabel('Bins')
-    plt.ylabel('Number of pixels')
-    plt.hist(masked_image[12, :, :].flatten(), 256, [0, 256], color='b')
-    # plt.hist(np.histogram(masked_image.flatten(),256))
-    plt.xlim([0, 256])
-
-    plt.show()
-
-    cv.waitKey(0)
