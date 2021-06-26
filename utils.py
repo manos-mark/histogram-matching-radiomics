@@ -337,8 +337,8 @@ def add_mask_to_image(img, mask, display=True):
 
             ax[0].imshow(img[:, :, i], cmap=plt.cm.gray)
             ax[0].set_title("Original")
-            ax[1].imshow(mask[:, :, i], cmap=plt.cm.gray)
-            ax[1].set_title("Extracted")
+            ax[1].imshow(images[:, :, i], cmap=plt.cm.gray)
+            ax[1].set_title("Merged")
 
             fig.tight_layout()
             plt.show()
