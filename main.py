@@ -22,7 +22,7 @@ def main():
     utils.convert_slice_to_nifti(DATASET_PATH, 'post-contrast')
 
     # Disable this for faster Debugging
-    utils.extract_brain(DATASET_PATH, 'post-contrast')
+    # utils.extract_brain(DATASET_PATH, 'post-contrast')
 
     # Prepare dataset for pyradiomics extractor
     # Getting the dataset's path, returns an object specifing for each patient the images and segmentations

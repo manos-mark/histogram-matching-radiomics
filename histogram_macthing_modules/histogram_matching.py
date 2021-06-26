@@ -42,7 +42,7 @@ class HistogramMatcher:
             self.__match_histograms(target_images, reference_img, using_mask_extraction, display=display)
 
     # Histogram Matching Function 
-    def __match_histograms(self, target_img, reference_img, using_mask_extraction=False, display=False):
+    def __match_histograms(self, target_img, reference_img, using_mask_extraction=True, display=False):
 
         target_img_path = None
         target_img_name = None
@@ -100,7 +100,7 @@ class HistogramMatcher:
         # Histogram Equalization to target image
         if len(target_image.shape) == 3:
             if using_mask_extraction:
-                target_image = utils.remove_mask_from_image(target_image, target_image_mask)
+                target_image, target_mask = utils.remove_mask_from_image(target_image, target_image_mask)
             target_image_equalized = utils.histogram_equalization_3D(target_image)
         else:
             target_image_equalized = utils.histogram_equalization_2D(target_img)
@@ -110,8 +110,8 @@ class HistogramMatcher:
         # Histogram Equalization to reference image
         if len(reference_image.shape) == 3:
             if using_mask_extraction:
-                reference_image = utils.remove_mask_from_image(reference_image, reference_image_mask)
-            reference_image_equalized = utils.histogram_equalization_3D(target_image)
+                reference_image, reference_mask = utils.remove_mask_from_image(reference_image, reference_image_mask)
+            reference_image_equalized = utils.histogram_equalization_3D(reference_image)
         else:
             reference_image_equalized = utils.histogram_equalization_2D(reference_image)
 
@@ -130,6 +130,9 @@ class HistogramMatcher:
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
 
+        # hist_matched_img = utils.add_mask_to_image(hist_matched_img, target_mask)
+
+        # Correct headers
         correct_headers_path = os.path.join('data', 'correct_headers')
         correct_headers_nifti_path = os.path.join(correct_headers_path, 'img_with_correct_header.nii')
         img_with_correct_header = nib.load(correct_headers_nifti_path)

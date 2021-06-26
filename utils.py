@@ -300,29 +300,51 @@ def get_dataset_as_object(dataset_path, contrast_type):
 
 
 def remove_mask_from_image(img, mask, display=False):
-    slices = np.zeros_like(img)
+    images = np.zeros_like(img)
+    masks = np.zeros_like(mask)
 
     for i in range(img.shape[2]):
-        gray_img = rgb2gray(img[:, :, i])
-        gray_mask = rgb2gray(mask[:, :, i])
-
-        extracted_image = cv.bitwise_xor(gray_img, gray_mask)
-
-        slices[:, :, i] = extracted_image
+        masks[:, :, i] = cv.bitwise_and(img[:, :, i], mask[:, :, i])
+        images[:, :, i] = cv.bitwise_xor(img[:, :, i], mask[:, :, i])
 
         if display:
             fig, axes = plt.subplots(1, 2, figsize=(8, 4))
             ax = axes.ravel()
 
-            ax[0].imshow(gray_img, cmap=plt.cm.gray)
+            ax[0].imshow(img[:, :, i], cmap=plt.cm.gray)
             ax[0].set_title("Original")
-            ax[1].imshow(extracted_image, cmap=plt.cm.gray)
+            ax[1].imshow(masks[:, :, i], cmap=plt.cm.gray)
             ax[1].set_title("Extracted")
 
             fig.tight_layout()
             plt.show()
 
-    return slices
+    return images, masks
+
+
+def add_mask_to_image(img, mask, display=True):
+    images = np.zeros_like(img)
+
+    for i in range(img.shape[2]):
+        print(img[:, :, i].shape)
+        print(mask[:, :, i].shape)
+        images[:, :, i] = cv.bitwise_and(img[:, :, i], mask[:, :, i])
+        # images[:, :, i] = cv.bitwise_xor(img[:, :, i], mask[:, :, i])
+
+        if display:
+            fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+            ax = axes.ravel()
+
+            ax[0].imshow(img[:, :, i], cmap=plt.cm.gray)
+            ax[0].set_title("Original")
+            ax[1].imshow(mask[:, :, i], cmap=plt.cm.gray)
+            ax[1].set_title("Extracted")
+
+            fig.tight_layout()
+            plt.show()
+
+    return images
+
 
 
 def extract_brain(dataset_path, constrast_type):
