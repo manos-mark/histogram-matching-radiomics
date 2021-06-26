@@ -303,8 +303,8 @@ def remove_mask_from_image(img, mask, display=False):
     slices = np.zeros_like(img)
 
     for i in range(img.shape[2]):
-        gray_img = rgb2gray(img)
-        gray_mask = rgb2gray(mask)
+        gray_img = rgb2gray(img[:, :, i])
+        gray_mask = rgb2gray(mask[:, :, i])
 
         extracted_image = cv.bitwise_xor(gray_img, gray_mask)
 

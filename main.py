@@ -54,7 +54,7 @@ def main():
     # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
     # Perform Batch histogram matching
-    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], using_mask_extraction=True, display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################

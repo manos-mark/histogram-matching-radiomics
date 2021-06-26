@@ -34,15 +34,15 @@ class HistogramMatcher:
             raise ValueError('{v} method is not supported'.format(v=method))
 
     # Histogram Macthing Function for a batch of images
-    def match_histograms(self, target_images, reference_img, display=False):
+    def match_histograms(self, target_images, reference_img, using_mask_extraction, display=False):
         if isinstance(target_images, list):
             for image in target_images:
-                self.__match_histograms(image, reference_img, display=display)
+                self.__match_histograms(image, reference_img, using_mask_extraction, display=display)
         else:
-            self.__match_histograms(target_images, reference_img, display=display)
+            self.__match_histograms(target_images, reference_img, using_mask_extraction, display=display)
 
     # Histogram Matching Function 
-    def __match_histograms(self, target_img, reference_img, display=False):
+    def __match_histograms(self, target_img, reference_img, using_mask_extraction=False, display=False):
 
         target_img_path = None
         target_img_name = None
@@ -99,8 +99,9 @@ class HistogramMatcher:
 
         # Histogram Equalization to target image
         if len(target_image.shape) == 3:
-            target_image_unmasked = utils.remove_mask_from_image(target_image, target_image_mask)
-            target_image_equalized = utils.histogram_equalization_3D(target_image_unmasked)
+            if using_mask_extraction:
+                target_image = utils.remove_mask_from_image(target_image, target_image_mask)
+            target_image_equalized = utils.histogram_equalization_3D(target_image)
         else:
             target_image_equalized = utils.histogram_equalization_2D(target_img)
 
@@ -108,8 +109,9 @@ class HistogramMatcher:
 
         # Histogram Equalization to reference image
         if len(reference_image.shape) == 3:
-            reference_image_unmasked = utils.remove_mask_from_image(reference_image, reference_image_mask)
-            reference_image_equalized = utils.histogram_equalization_3D(reference_image_unmasked)
+            if using_mask_extraction:
+                reference_image = utils.remove_mask_from_image(reference_image, reference_image_mask)
+            reference_image_equalized = utils.histogram_equalization_3D(target_image)
         else:
             reference_image_equalized = utils.histogram_equalization_2D(reference_image)
 
@@ -133,8 +135,8 @@ class HistogramMatcher:
         img_with_correct_header = nib.load(correct_headers_nifti_path)
         affine = img_with_correct_header.affine
         # header = img_with_correct_header.header
-        # hist_matched_img = np.rot90(hist_matched_img)
-        # hist_matched_img = np.flipud(hist_matched_img)
+        hist_matched_img = np.rot90(hist_matched_img)
+        hist_matched_img = np.flipud(hist_matched_img)
 
         nib.Nifti1Image(hist_matched_img, affine).to_filename(os.path.join(new_dir, target_img_name))
         # skimage.io.imsave(os.path.join(new_dir, target_img_name), hist_matched_img)
@@ -170,6 +172,8 @@ class HistogramMatcher:
 
             # Result Image (Matched to Histogram)
             subplot = figure3.add_subplot(325)
+            hist_matched_img = np.rot90(hist_matched_img)
+            hist_matched_img = np.flipud(hist_matched_img)
             plt.imshow(np.array(hist_matched_img[:, :, 0], np.int32), cmap='gray')
 
             subplot.set_title('Image Matched to Histogram')
