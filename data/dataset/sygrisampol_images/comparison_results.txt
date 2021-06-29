@@ -1,0 +1,374 @@
+Final Results Comparisons
+-------------
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_4942_19970222_3_post-contrast.tif
+Mean Square Error: 1367.2627868652344
+SSIM: 0.3331250382117352
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_4943_20000902_3_post-contrast.tif
+Mean Square Error: 1794.0069732666016
+SSIM: 0.24266779130462884
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_4944_20010208_4_post-contrast.tif
+Mean Square Error: 1846.6890869140625
+SSIM: 0.26460506386017324
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_5393_19990606_4_post-contrast.tif
+Mean Square Error: 1486.2442169189453
+SSIM: 0.2833331567044033
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_5395_19981004_2_post-contrast.tif
+Mean Square Error: 1558.2220764160156
+SSIM: 0.2783800771289641
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_5396_20010302_7_post-contrast.tif
+Mean Square Error: 1546.3587493896484
+SSIM: 0.296914919063046
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_5397_20010315_5_post-contrast.tif
+Mean Square Error: 1794.879135131836
+SSIM: 0.24910806772582855
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_6186_20000601_4_post-contrast.tif
+Mean Square Error: 1159.969970703125
+SSIM: 0.3603650197021562
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _CS_6188_20010812_5_post-contrast.tif
+Mean Square Error: 959.2384338378906
+SSIM: 0.33392212134311533
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5849_19950405_11_post-contrast.tif
+Mean Square Error: 1654.3728332519531
+SSIM: 0.21535149577980603
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5851_19950428_9_post-contrast.tif
+Mean Square Error: 1695.2684326171875
+SSIM: 0.308813670032135
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5852_19950709_7_post-contrast.tif
+Mean Square Error: 1630.9341888427734
+SSIM: 0.23450249037254803
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5853_19950823_8_post-contrast.tif
+Mean Square Error: 1628.524154663086
+SSIM: 0.2265552946067928
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5854_19951104_8_post-contrast.tif
+Mean Square Error: 1614.8411560058594
+SSIM: 0.2978224483848283
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5855_19951217_5_post-contrast.tif
+Mean Square Error: 1667.943359375
+SSIM: 0.2437221755178941
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5871_19941206_7_post-contrast.tif
+Mean Square Error: 1499.298324584961
+SSIM: 0.21852356154270128
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5872_19950223_14_post-contrast.tif
+Mean Square Error: 1699.5346374511719
+SSIM: 0.3035403839964501
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_5874_19950510_8_post-contrast.tif
+Mean Square Error: 1442.1625213623047
+SSIM: 0.2560830781451093
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _DU_6399_19830416_6_post-contrast.tif
+Mean Square Error: 1968.4556884765625
+SSIM: 0.30276336335536114
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_5962_20000626_9_post-contrast.tif
+Mean Square Error: 1457.5459442138672
+SSIM: 0.27709872370583366
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_5964_20010511_5_post-contrast.tif
+Mean Square Error: 1538.1592712402344
+SSIM: 0.29153265414239654
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_6689_20020326_12_post-contrast.tif
+Mean Square Error: 1700.3790283203125
+SSIM: 0.317117992768606
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_6690_20020226_14_post-contrast.tif
+Mean Square Error: 1664.1389923095703
+SSIM: 0.2668759903384159
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_6691_20020405_12_post-contrast.tif
+Mean Square Error: 1727.6001281738281
+SSIM: 0.3006341959087779
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_6692_20020606_4_post-contrast.tif
+Mean Square Error: 2081.6598358154297
+SSIM: 0.3201767445678714
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_7637_20000922_8_post-contrast.tif
+Mean Square Error: 1524.7922973632812
+SSIM: 0.2714246978863595
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_7643_20021104_8_post-contrast.tif
+Mean Square Error: 1724.366714477539
+SSIM: 0.2987254764673561
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_8189_20030516_12_post-contrast.tif
+Mean Square Error: 1171.2613067626953
+SSIM: 0.3384830902860421
+
+For image : _CS_4941_19960909_5_post-contrast.tif | _FG_A4MT_20020212_5_post-contrast.tif
+Mean Square Error: 1773.1458587646484
+SSIM: 0.29239671254286664
+
+-------------
+-------------
+-------------
+-------------
+-------------
+-------------
+Final Results Comparisons
+-------------
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_4942_19970222_3_pre-contrast.tif
+Mean Square Error: 3984.652618408203
+SSIM: 0.28800078522686134
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_4943_20000902_3_pre-contrast.tif
+Mean Square Error: 3475.9225158691406
+SSIM: 0.2444078596808118
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_4944_20010208_4_pre-contrast.tif
+Mean Square Error: 4237.151596069336
+SSIM: 0.25352875900800415
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_5393_19990606_4_pre-contrast.tif
+Mean Square Error: 3479.174057006836
+SSIM: 0.2914599509559336
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_5395_19981004_2_pre-contrast.tif
+Mean Square Error: 3295.6727905273438
+SSIM: 0.292516365933096
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_5396_20010302_7_pre-contrast.tif
+Mean Square Error: 4181.580429077148
+SSIM: 0.3077986023002413
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_5397_20010315_5_pre-contrast.tif
+Mean Square Error: 4233.208724975586
+SSIM: 0.258491311873845
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_6186_20000601_4_pre-contrast.tif
+Mean Square Error: 3399.3868560791016
+SSIM: 0.30503820216592303
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _CS_6188_20010812_5_pre-contrast.tif
+Mean Square Error: 2962.7168731689453
+SSIM: 0.34301058295404674
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5849_19950405_11_pre-contrast.tif
+Mean Square Error: 4034.5213165283203
+SSIM: 0.22791148059395103
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5851_19950428_9_pre-contrast.tif
+Mean Square Error: 4585.805511474609
+SSIM: 0.30405241074272304
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5852_19950709_7_pre-contrast.tif
+Mean Square Error: 4291.410308837891
+SSIM: 0.2319760208151272
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5853_19950823_8_pre-contrast.tif
+Mean Square Error: 4269.743515014648
+SSIM: 0.23802161972217237
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5854_19951104_8_pre-contrast.tif
+Mean Square Error: 4294.619766235352
+SSIM: 0.28897629841688766
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5855_19951217_5_pre-contrast.tif
+Mean Square Error: 4269.781692504883
+SSIM: 0.2588176525556675
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5871_19941206_7_pre-contrast.tif
+Mean Square Error: 4242.198806762695
+SSIM: 0.22230867160926343
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5872_19950223_14_pre-contrast.tif
+Mean Square Error: 4327.643630981445
+SSIM: 0.2835829339865879
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_5874_19950510_8_pre-contrast.tif
+Mean Square Error: 4015.689178466797
+SSIM: 0.25874766935034865
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _DU_6399_19830416_6_pre-contrast.tif
+Mean Square Error: 4243.611022949219
+SSIM: 0.29353680271198507
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_5962_20000626_9_pre-contrast.tif
+Mean Square Error: 3821.1346740722656
+SSIM: 0.10784896840954707
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_5964_20010511_5_pre-contrast.tif
+Mean Square Error: 2601.536834716797
+SSIM: 0.3073023238401554
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_6689_20020326_12_pre-contrast.tif
+Mean Square Error: 3854.627197265625
+SSIM: 0.3162836237978181
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_6690_20020226_14_pre-contrast.tif
+Mean Square Error: 4133.013259887695
+SSIM: 0.30310271734300864
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_6691_20020405_12_pre-contrast.tif
+Mean Square Error: 4305.628219604492
+SSIM: 0.30738364341567004
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_6692_20020606_4_pre-contrast.tif
+Mean Square Error: 3130.9074096679688
+SSIM: 0.34259138266665745
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_7637_20000922_8_pre-contrast.tif
+Mean Square Error: 5825.933639526367
+SSIM: 0.11594661562098857
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_7643_20021104_8_pre-contrast.tif
+Mean Square Error: 4216.286102294922
+SSIM: 0.296017049110066
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_8189_20030516_12_pre-contrast.tif
+Mean Square Error: 2917.0533294677734
+SSIM: 0.35296061941004564
+
+For image : _CS_4941_19960909_5_pre-contrast.tif | _FG_A4MT_20020212_5_pre-contrast.tif
+Mean Square Error: 3631.9393157958984
+SSIM: 0.29431933909514046
+
+-------------
+-------------
+-------------
+-------------
+-------------
+-------------
+Final Results Comparisons
+-------------
+For image : _CS_4941_19960909_5_flair.tif | _CS_4942_19970222_3_flair.tif
+Mean Square Error: 3396.090621948242
+SSIM: 0.21714419066082274
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_4943_20000902_3_flair.tif
+Mean Square Error: 2978.9050903320312
+SSIM: 0.1592704266549328
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_4944_20010208_4_flair.tif
+Mean Square Error: 3282.6067962646484
+SSIM: 0.17994029971073075
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_5393_19990606_4_flair.tif
+Mean Square Error: 2842.9258422851562
+SSIM: 0.2080484055834029
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_5395_19981004_2_flair.tif
+Mean Square Error: 2717.1786499023438
+SSIM: 0.1997785536449787
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_5396_20010302_7_flair.tif
+Mean Square Error: 3754.7159576416016
+SSIM: 0.23814586130771453
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_5397_20010315_5_flair.tif
+Mean Square Error: 3481.9188690185547
+SSIM: 0.1853729057356764
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_6186_20000601_4_flair.tif
+Mean Square Error: 2924.695816040039
+SSIM: 0.31386260342303957
+
+For image : _CS_4941_19960909_5_flair.tif | _CS_6188_20010812_5_flair.tif
+Mean Square Error: 2434.840133666992
+SSIM: 0.24343499706268898
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5849_19950405_11_flair.tif
+Mean Square Error: 3127.633270263672
+SSIM: 0.28388407595641696
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5851_19950428_9_flair.tif
+Mean Square Error: 3638.5625610351562
+SSIM: 0.27593518228908415
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5852_19950709_7_flair.tif
+Mean Square Error: 3295.996322631836
+SSIM: 0.2883542776314275
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5853_19950823_8_flair.tif
+Mean Square Error: 3261.5855102539062
+SSIM: 0.28848935930032893
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5854_19951104_8_flair.tif
+Mean Square Error: 3417.357177734375
+SSIM: 0.29208334412124626
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5855_19951217_5_flair.tif
+Mean Square Error: 3294.077423095703
+SSIM: 0.15332266372903378
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5871_19941206_7_flair.tif
+Mean Square Error: 3289.683334350586
+SSIM: 0.28573257364493015
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5872_19950223_14_flair.tif
+Mean Square Error: 3493.567642211914
+SSIM: 0.24643790191844037
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_5874_19950510_8_flair.tif
+Mean Square Error: 3151.966064453125
+SSIM: 0.2910558718743551
+
+For image : _CS_4941_19960909_5_flair.tif | _DU_6399_19830416_6_flair.tif
+Mean Square Error: 3616.9467163085938
+SSIM: 0.26445260640757434
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_5962_20000626_9_flair.tif
+Mean Square Error: 3797.7749633789062
+SSIM: 0.2228912331092159
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_5964_20010511_5_flair.tif
+Mean Square Error: 2344.0767974853516
+SSIM: 0.28472200453132346
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_6689_20020326_12_flair.tif
+Mean Square Error: 3250.018264770508
+SSIM: 0.29359157484493276
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_6690_20020226_14_flair.tif
+Mean Square Error: 3725.811309814453
+SSIM: 0.19660034050384448
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_6691_20020405_12_flair.tif
+Mean Square Error: 3605.6027221679688
+SSIM: 0.2777114419194954
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_6692_20020606_4_flair.tif
+Mean Square Error: 2920.6273498535156
+SSIM: 0.259811922800835
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_7637_20000922_8_flair.tif
+Mean Square Error: 3539.561309814453
+SSIM: 0.19045804820882342
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_7643_20021104_8_flair.tif
+Mean Square Error: 3439.95703125
+SSIM: 0.26726238005613295
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_8189_20030516_12_flair.tif
+Mean Square Error: 2906.655288696289
+SSIM: 0.27772582239424065
+
+For image : _CS_4941_19960909_5_flair.tif | _FG_A4MT_20020212_5_flair.tif
+Mean Square Error: 3101.8312072753906
+SSIM: 0.24586286478061997
+
+-------------
+-------------
+-------------
+-------------
+-------------
+-------------
+
+Process finished with exit code 0

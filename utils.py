@@ -13,6 +13,7 @@ import dicom2nifti
 from PIL import Image
 from skimage.color import rgb2gray
 
+
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
         # Get the image path, replace it with the image path from the old dataset
@@ -346,7 +347,6 @@ def add_mask_to_image(img, mask, display=True):
     return images
 
 
-
 def extract_brain(dataset_path, constrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
@@ -474,4 +474,3 @@ def evaluate_processed_images(dataset_path) -> None:
     print(f"The best post-contrast image is from:"
           f"\nSlice - {best_post_constrast_image['slice']}"
           f"\nContrast Score: {best_post_constrast_image['contrast_score']}")
-
