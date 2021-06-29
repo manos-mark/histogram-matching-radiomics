@@ -415,7 +415,7 @@ def evaluate_processed_images(dataset_path) -> None:
     """
     Rates the contrast of images
 
-    :param stuff:
+    :param dataset_path:
     :return:
     """
     dirnames: str = glob.glob(os.path.join(dataset_path, "*", ""))
