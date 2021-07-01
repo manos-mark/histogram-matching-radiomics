@@ -32,19 +32,19 @@ def compare_images(imageA, imageB, files, title='Comparison'):
     #     print(f"Mean Square Error: {m} - SSIM: {s}")
     #     print("--- ---")
 
-    # # setup the figure
-    # fig = plt.figure(title)
-    # plt.suptitle("MSE: %.2f, SSIM: %.2f" % (m, s))
-    # # show first image
-    # ax = fig.add_subplot(1, 2, 1)
-    # plt.imshow(imageA, cmap=plt.cm.gray)
-    # plt.axis("off")
-    # # show the second image
-    # ax = fig.add_subplot(1, 2, 2)
-    # plt.imshow(imageB, cmap=plt.cm.gray)
-    # plt.axis("off")
-    # # show the images
-    # plt.show()
+    # setup the figure
+    fig = plt.figure(title)
+    plt.suptitle("MSE: %.2f, SSIM: %.2f" % (m, s))
+    # show first image
+    ax = fig.add_subplot(1, 2, 1)
+    plt.imshow(imageA, cmap=plt.cm.gray)
+    plt.axis("off")
+    # show the second image
+    ax = fig.add_subplot(1, 2, 2)
+    plt.imshow(imageB, cmap=plt.cm.gray)
+    plt.axis("off")
+    # show the images
+    plt.show()
 
     return m, s
 
@@ -53,7 +53,6 @@ def main() -> None:
     results = dict()
 
     DATASET_PATH = os.path.join('data', 'dataset', 'sygrisampol_images')
-    # dirnames = glob.glob(os.path.join(DATASET_PATH, "*", ""))
 
     post_contrast_imgs = glob.glob(os.path.join(DATASET_PATH, "*_post-contrast.tif"))
     pre_contrast_imgs = glob.glob(os.path.join(DATASET_PATH, "*_pre-contrast.tif"))
