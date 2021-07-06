@@ -1,4 +1,4 @@
-# from radiomics_modules.feature_extraction import FeatureExtractor
+from radiomics_modules.feature_extraction import FeatureExtractor
 from histogram_macthing_modules.histogram_matching import HistogramMatcher
 
 import skimage.io
@@ -39,22 +39,22 @@ def main():
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
 
     # Initialize PyRadiomics feature extractor wrapper
-    # feature_extractor = FeatureExtractor(PARAMETERS_PATH)
+    feature_extractor = FeatureExtractor(PARAMETERS_PATH)
 
     # Execute batch processing to extract features
-    # feature_extractor.extract_features(flair_dataset, FEATURES_OUTPUT_PATH)
+    feature_extractor.extract_features(post_contrast_dataset, FEATURES_OUTPUT_PATH)
 
     # ######################################################################################################
     # ######################################### HISTOGRAM MATCHING #########################################
 
     # Initialize HistogramMatcher & select histogram matching method
-    histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
+    # histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
 
     # Perform histogram matching
     # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
 
     # Perform Batch histogram matching
-    histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], using_mask_extraction=True, display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
+    # histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], using_mask_extraction=True, display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
