@@ -74,7 +74,9 @@ def main():
     images = [[], [], []]
     
     p = 0
-    for i in [5, 20, 40]:
+    clip_lim = [5,10, 20]
+    
+    for i in clip_lim:
         images[p] = utils.histogram_equalization_CLAHE(pos_images_names, tile_grid_size=(24,24), clip_limit=i)
         utils.histograms_compare(images[p], pos_images_names, name=i)
         p = p + 1
