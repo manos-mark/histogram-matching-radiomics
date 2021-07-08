@@ -36,17 +36,17 @@ def histograms_compare(images,image_names,metric=0,name=''):
 
     image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
     
-    histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in images]
+    histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in images]
     
     mat = np.zeros((len(images),len(images)))
     
     
     
-    methods = [cv2.HISTCMP_BHATTACHARYYA ]
+    methods = [cv.HISTCMP_BHATTACHARYYA ]
     
     for i in range(len(images)):
         for j in range(len(images)): 
-            mat[i][j]=cv2.compareHist(histograms[i],histograms[j],methods[metric])
+            mat[i][j]=cv.compareHist(histograms[i],histograms[j],methods[metric])
             
     fig,ax = plt.subplots()
     
@@ -109,13 +109,13 @@ def ssim_compare(image,images,image_names,name=''):
 
 def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
     
-    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+    clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
     
-    images  = [ cv2.imread(x, 0)  for x in images_name]
+    images  = [ cv.imread(x, 0)  for x in images_name]
     
     clahe_images = [clahe.apply(x) for x in images]
     
-    histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
+    histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
 
     line =np.arange(0, 256)
     
@@ -140,14 +140,18 @@ def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(3
     return clahe_images
 
 def exact_histogram_matching(images_name, ref_img):
-        
-    images  = [ cv2.imread(x, 0)  for x in images_name]
-    
-    reference_histogram = ExactHistogramMatcher.get_histogram(cv2.imread(ref_img, 0))
+
+    images  = [ cv.imread(x, 0)  for x in images_name]
+    import os
+    cwd = os.getcwd()
+    print(cwd)
+    g = cv.imread(ref_img,0)
+
+    reference_histogram = ExactHistogramMatcher.get_histogram(g)
     
     exact_imgs = [ExactHistogramMatcher.match_image_to_histogram(i, reference_histogram) for i in images ]
  
-    histograms = [ cv2.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
+    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
     
     line =np.arange(0, 256)
     plt.figure('1')
