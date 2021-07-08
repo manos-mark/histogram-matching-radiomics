@@ -29,18 +29,74 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
 
     return dataset
 
+def histograms_compare(images,image_names,metric=0):
 
-def histogram_equalization_CLAHE(img, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
-    print(img)
-    clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+    image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
+    
+    histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in images]
+    
+    mat = np.zeros((len(images),len(images)))  
 
-    image = cv.resize(img, (200, 200), interpolation=cv.INTER_AREA)
+    methods = [cv2.HISTCMP_BHATTACHARYYA ]
+    
+    for i in range(len(images)):
+        for j in range(len(images)): 
+            mat[i][j]=cv2.compareHist(histograms[i],histograms[j],methods[metric])
+            
+    fig,ax = plt.subplots()
+    f = np.around(mat,1)
+    print(f)
 
-    clahe_image = clahe.apply(image)
+    im = ax.imshow(f)
 
-    # clahe_histograms = [cv.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
+    ax.set_xticks(np.arange(len(image_names)))
+    ax.set_xticklabels(image_names)
+    
+    ax.set_yticks(np.arange(len(image_names)))
+    ax.set_yticklabels(image_names)
 
-    return clahe_image
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",rotation_mode="anchor")
+
+    for i in range(len(image_names)):
+        for j in range(len(image_names)):
+            text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
+            
+    plt.show()    
+    
+    return mat
+
+
+def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
+    
+    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+    
+    images  = [ cv2.imread(x, 0)  for x in images_name]
+    
+    clahe_images = [clahe.apply(x) for x in images]
+    
+    histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
+    
+    line =np.arange(0, 256)
+    
+    plt.figure(1)
+    
+    for i in range(0,len(images_name)):
+        plt.xlim(0,255)
+        plt.ylim(0, 5000)
+        plt.plot(line,histograms[i],label=images_name[i])
+        plt.title("CLAHE  histograms ")
+        plt.show()
+    
+    plt.figure(2)
+    
+    images_num = int(math.sqrt(len(images_name)))+1
+    
+    for i in range(0,len(images_name)):
+        plt.subplot(images_num,images_num, i+1),plt.imshow(clahe_images[i],'gray')
+        plt.show()
+    
+    return clahe_images
+
 
 
 # Histogram Equalization Function
