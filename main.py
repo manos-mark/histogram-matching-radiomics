@@ -86,6 +86,20 @@ def main():
     
     CLAHE_images_final = images[0]   
     
+    
+    
+    #save clahe images
+    for j in range(0,len(clip_lim)):
+        for i in range(0,len(pos_images_names)):
+            if not os.path.exists('images/'+pos_images_names[i][-64:-27]):
+                os.makedirs('images/'+pos_images_names[i][-64:-27])
+            cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/CLAHE_CLIP_LIM_'+str(clip_lim[j])+'.png',images[j][i]) 
+        
+    #save exact hist match
+    
+    for i in range(0,len(pos_images_names)):
+                cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/EXACT_HIST.png',exact_matching_final[i]) 
+
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
     #####################################    FROM THE NEW DATASET    #####################################
