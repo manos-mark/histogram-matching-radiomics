@@ -2,6 +2,7 @@ from radiomics_modules.feature_extraction import FeatureExtractor
 from histogram_macthing_modules.histogram_matching import HistogramMatcher
 
 import skimage.io
+import cv2 as cv
 import utils
 import os
 import glob
@@ -58,39 +59,30 @@ def main():
     #exact histogram matching
     
     #====  NEW ===========================================================================
-  
-    
-    path = 'data/dataset/' 
-    
-    folders = os.listdir(path)
-    
-    pos_images_names = [glob.glob(os.path.join( path+i, "*post-contrast.tif_removed_background.png"))[0] for i in folders]
 
-    
+
+    folders = os.listdir(DATASET_PATH)
+    print(DATASET_PATH)
+    pos_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*post-contrast.tif_removed_background.png"))[0] for folder in folders]
+
     #exact histogram matching
-
     ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
     
-    exact_matching_final = utils.exact_histogram_matching(pos_images_names,ref_image)
+    exact_matching_final = utils.exact_histogram_matching(pos_images_names, ref_image)
 #    
-#    # CLAHE 
+#    # CLAHE
+    images = [[], [], []]
     
-    
-    clip_lim = [5 ,20 , 40 ]
-    
-    images = [[],[],[]]
-    
-    p=0
-    
-    for i in clip_lim:
-        images[p] = utils.histogram_equalization_CLAHE(pos_images_names,tile_grid_size=(24,24), clip_limit=i)
-        utils.histograms_compare(images[p],pos_images_names,name=i)
-        p=p+1
+    p = 0
+    for i in [5, 20, 40]:
+        images[p] = utils.histogram_equalization_CLAHE(pos_images_names, tile_grid_size=(24,24), clip_limit=i)
+        utils.histograms_compare(images[p], pos_images_names, name=i)
+        p = p + 1
     
     #pinakas me tis arxikew ikones
-    init_img = [cv.imread(x, 0)   for x in pos_images_names]
+    init_img = [cv.imread(x, 0) for x in pos_images_names]
     
-    utils.ssim_compare(init_img,images,pos_images_names)
+    utils.ssim_compare(init_img, images, pos_images_names)
     
     CLAHE_images_final = images[0]   
     
