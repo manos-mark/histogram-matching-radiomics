@@ -29,14 +29,16 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
 
     return dataset
 
-def histograms_compare(images,image_names,metric=0):
+def histograms_compare(images,image_names,metric=0,name=''):
 
     image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
     
     histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in images]
     
-    mat = np.zeros((len(images),len(images)))  
-
+    mat = np.zeros((len(images),len(images)))
+    
+    
+    
     methods = [cv2.HISTCMP_BHATTACHARYYA ]
     
     for i in range(len(images)):
@@ -44,26 +46,62 @@ def histograms_compare(images,image_names,metric=0):
             mat[i][j]=cv2.compareHist(histograms[i],histograms[j],methods[metric])
             
     fig,ax = plt.subplots()
-    f = np.around(mat,1)
-    print(f)
-
+    
+    f = np.around(mat,2)
+    
     im = ax.imshow(f)
 
-    ax.set_xticks(np.arange(len(image_names)))
-    ax.set_xticklabels(image_names)
-    
     ax.set_yticks(np.arange(len(image_names)))
     ax.set_yticklabels(image_names)
+    
+    ax.set_xticks(np.arange(len(image_names)))
+    ax.set_xticklabels(image_names)
 
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right",rotation_mode="anchor")
 
     for i in range(len(image_names)):
         for j in range(len(image_names)):
             text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
-            
-    plt.show()    
+  
+    ax.set_title("histograms distance with clip limit "+str(name))
     
     return mat
+
+def ssim_compare(image,images,image_names,name=''):
+
+    image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
+   
+    mat = np.zeros((len(images), len(image)))
+    
+    for h in range(len(images)):
+        for i in range(len(image)):
+            mat[h][i] = ssim(image[i],images[h][i])
+              
+    g = ['clip lim 10','clip_lim 20' ,'clip lim 40']
+            
+    fig,ax = plt.subplots()
+    
+    f = np.around(mat,2)
+    
+    im = ax.imshow(f)
+
+    ax.set_xticks(np.arange(len(image)))
+    ax.set_xticklabels(image_names)
+    
+    ax.set_yticks(np.arange(len(images)))
+    ax.set_yticklabels(g)
+
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",rotation_mode="anchor")
+
+    for i in range(len(g)):
+        for j in range(len(image_names)):
+            text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
+  
+    ax.set_title("ssim distance between original and clahe enhanced images")
+
+    
+    return mat
+
 
 
 def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
@@ -75,27 +113,54 @@ def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(3
     clahe_images = [clahe.apply(x) for x in images]
     
     histograms = [ cv2.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
-    
+
     line =np.arange(0, 256)
     
-    plt.figure(1)
-    
+    plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'hist')
     for i in range(0,len(images_name)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=images_name[i])
-        plt.title("CLAHE  histograms ")
+        plt.title("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size))
+        
         plt.show()
     
-    plt.figure(2)
+    plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'img')
     
     images_num = int(math.sqrt(len(images_name)))+1
     
     for i in range(0,len(images_name)):
         plt.subplot(images_num,images_num, i+1),plt.imshow(clahe_images[i],'gray')
         plt.show()
+   
     
     return clahe_images
+
+def exact_histogram_matching(images_name, ref_img):
+        
+    images  = [ cv2.imread(x, 0)  for x in images_name]
+    
+    reference_histogram = ExactHistogramMatcher.get_histogram(cv2.imread(ref_img, 0))
+    
+    exact_imgs = [ExactHistogramMatcher.match_image_to_histogram(i, reference_histogram) for i in images ]
+ 
+    histograms = [ cv2.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
+    
+    line =np.arange(0, 256)
+    plt.figure('1')
+    for i in range(0,len(images_name)):
+        plt.xlim(0,255)
+        plt.ylim(0, 5000)
+        plt.plot(line,histograms[i],label=images_name[i])
+        plt.show()
+        
+    images_num = int(math.sqrt(len(images_name)))+1
+    plt.figure('2')
+    for i in range(0,len(images_name)):
+        plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
+        plt.show()
+ 
+    return exact_imgs
 
 
 
