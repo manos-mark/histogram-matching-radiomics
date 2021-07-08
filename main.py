@@ -57,31 +57,40 @@ def main():
     # histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], using_mask_extraction=True, display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
     #exact histogram matching
     
-    #====  NEW
-#    DATASET_PATH = os.path.join('data', 'dataset', 'sygrisampol_images')
-#
-#    post_contrast_imgs = glob.glob(os.path.join(DATASET_PATH, "*post-contrast.tif_removed_background.png"))
-#    
-#    
-#    #exact histogram matching
-#    
-#    exact_matching_final = utils.exact_histogram_matching(post_contrast_imgs,post_contrast_imgs[0])
+    #====  NEW ===========================================================================
+  
+    
+    path = 'data/dataset/' 
+    
+    folders = os.listdir(path)
+    
+    pos_images_names = [glob.glob(os.path.join( path+i, "*post-contrast.tif_removed_background.png"))[0] for i in folders]
+
+    
+    #exact histogram matching
+    
+    exact_matching_final = utils.exact_histogram_matching(pos_images_names,pos_images_names[0])
 #    
 #    # CLAHE 
-#    
-#    init_img = [cv2.imread(x, 0)   for x in post_contrast_imgs]
-#    clip_lim = [5 ,20 , 40 ]
-#    images = [[],[],[]]
-#    p=0
-#    for i in clip_lim:
-#        images[p] = utils.histogram_equalization_CLAHE(post_contrast_imgs,tile_grid_size=(24,24), clip_limit=i)
-#        utils.histograms_compare(images[p],post_contrast_imgs,name=i)
-#        p=p+1
-#        
-#    utils.ssim_compare(init_img,images,post_contrast_imgs)
-#    
-#    CLAHE_images_final = images[0]
-#    
+    
+    
+    clip_lim = [5 ,20 , 40 ]
+    
+    images = [[],[],[]]
+    
+    p=0
+    
+    for i in clip_lim:
+        images[p] = utils.histogram_equalization_CLAHE(pos_images_names,tile_grid_size=(24,24), clip_limit=i)
+        utils.histograms_compare(images[p],pos_images_names,name=i)
+        p=p+1
+    
+    #pinakas me tis arxikew ikones
+    init_img = [cv.imread(x, 0)   for x in pos_images_names]
+    
+    utils.ssim_compare(init_img,images,pos_images_names)
+    
+    CLAHE_images_final = images[0]   
     
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
