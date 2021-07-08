@@ -68,8 +68,10 @@ def main():
 
     
     #exact histogram matching
+
+    ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
     
-    exact_matching_final = utils.exact_histogram_matching(pos_images_names,pos_images_names[0])
+    exact_matching_final = utils.exact_histogram_matching(pos_images_names,ref_image)
 #    
 #    # CLAHE 
     
