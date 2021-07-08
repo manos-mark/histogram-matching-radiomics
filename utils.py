@@ -32,11 +32,12 @@ def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_p
 
     return dataset
 
-def histograms_compare(images,image_names,metric=0,name=''):
+
+def histograms_compare(images,image_names,metric=0):
 
     image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
     
-    histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in images]
+    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]
     
     mat = np.zeros((len(images),len(images)))
     
@@ -66,52 +67,26 @@ def histograms_compare(images,image_names,metric=0,name=''):
         for j in range(len(image_names)):
             text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
   
-    ax.set_title("histograms distance with clip limit "+str(name))
     
     return mat
 
-def ssim_compare(image,images,image_names,name=''):
-
-    image_names = [ i.replace('data/dataset/sygrisampol_images/', '').replace('post-contrast.tif_removed_background.png', '')  for i in image_names ]
+def ssim_compare(image,images,image_names,text=''):
    
-    mat = np.zeros((len(images), len(image)))
+    mat = []
     
-    for h in range(len(images)):
-        for i in range(len(image)):
-            mat[h][i] = ssim(image[i],images[h][i])
-              
-    g = ['clip lim 10','clip_lim 20' ,'clip lim 40']
-            
-    fig,ax = plt.subplots()
-    
-    f = np.around(mat,2)
-    
-    im = ax.imshow(f)
-
-    ax.set_xticks(np.arange(len(image)))
-    ax.set_xticklabels(image_names)
-    
-    ax.set_yticks(np.arange(len(images)))
-    ax.set_yticklabels(g)
-
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",rotation_mode="anchor")
-
-    for i in range(len(g)):
-        for j in range(len(image_names)):
-            text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
-  
-    ax.set_title("ssim distance between original and clahe enhanced images")
-
+ 
+    for i in range(len(image)):
+        mat.append(ssim(image[i],images[i]))
+        
+    print(mat)
     
     return mat
 
 
 
-def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0):
+def histogram_equalization_CLAHE(images, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0,images_name=''):
     
     clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-    
-    images  = [ cv.imread(x, 0)  for x in images_name]
     
     clahe_images = [clahe.apply(x) for x in images]
     
@@ -136,18 +111,13 @@ def histogram_equalization_CLAHE(images_name, number_bins=256, tile_grid_size=(3
         plt.subplot(images_num,images_num, i+1),plt.imshow(clahe_images[i],'gray')
         plt.show()
    
-    
     return clahe_images
 
-def exact_histogram_matching(images_name, ref_img):
 
-    images  = [ cv.imread(x, 0)  for x in images_name]
-    import os
-    cwd = os.getcwd()
-    print(cwd)
-    g = cv.imread(ref_img,0)
 
-    reference_histogram = ExactHistogramMatcher.get_histogram(g)
+def exact_histogram_matching(images, ref_img,images_name=''):
+    
+    reference_histogram = ExactHistogramMatcher.get_histogram(ref_img)
     
     exact_imgs = [ExactHistogramMatcher.match_image_to_histogram(i, reference_histogram) for i in images ]
  
@@ -155,21 +125,19 @@ def exact_histogram_matching(images_name, ref_img):
     
     line =np.arange(0, 256)
     plt.figure('1')
-    for i in range(0,len(images_name)):
+    for i in range(0,len(images)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=images_name[i])
         plt.show()
         
-    images_num = int(math.sqrt(len(images_name)))+1
+    images_num = int(math.sqrt(len(images)))+1
     plt.figure('2')
     for i in range(0,len(images_name)):
         plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
         plt.show()
  
     return exact_imgs
-
-
 
 # Histogram Equalization Function
 # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
