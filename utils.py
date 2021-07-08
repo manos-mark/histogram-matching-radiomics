@@ -266,10 +266,10 @@ def get_dataset_as_object(dataset_path, contrast_type):
     dirnames = glob.glob(os.path.join(dataset_path, "*", ""))
 
     for dir in dirnames:
-        filenames = glob.glob(os.path.join(dir, "*.nii"))
+        filenames = glob.glob(os.path.join(dir, "*.png"))
 
         for file in filenames:
-
+            print(contrast_type + ".tif_removed_background.png")
             if "_mask" in file:
                 filename = file.rsplit("_")[:-1]
                 filename = '_'.join(filename)
@@ -281,14 +281,14 @@ def get_dataset_as_object(dataset_path, contrast_type):
                 else:
                     cases_dict[filename] = {'Mask': file}
 
-            elif file.endswith(contrast_type + ".nii"):
+            elif file.endswith(contrast_type + ".tif_removed_background.png"):
                 filename = file.rsplit(".")[:-1]
                 filename = ''.join(filename)
                 filename = file.rsplit("_")[:-1]
                 filename = '_'.join(filename)
                 filename = filename.rsplit("/")[2:]
                 filename = ''.join(filename)
-
+                print(filename)
                 if filename in cases_dict.keys():
                     cases_dict[filename].update({'Image': file})
                 else:
