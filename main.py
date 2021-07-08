@@ -63,44 +63,42 @@ def main():
 
     folders = os.listdir(DATASET_PATH)
     print(DATASET_PATH)
+    
+    #onomata arxikon eikonon 
+    
     pos_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*post-contrast.tif_removed_background.png"))[0] for folder in folders]
-
+    #diavasma arxikon eikonon 
+    
+    original_images = [ cv.imread(x, 0)  for x in pos_images_names]
+    
+    #eikones me clahe 
+    clahe_images =utils.histogram_equalization_CLAHE(original_images,tile_grid_size=(24,24), clip_limit=5.0,images_name=pos_images_names)
+    
     #exact histogram matching
+    
     ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
+ 
+    exact_hist_images = utils.exact_histogram_matching(original_images,cv.imread(ref_image, 0) ,images_name=pos_images_names)
     
-    exact_matching_final = utils.exact_histogram_matching(pos_images_names, ref_image)
-#    
-#    # CLAHE
-    images = [[], [], []]
     
-    p = 0
-    clip_lim = [5,10, 20]
+    utils.histograms_compare(exact_hist_images,pos_images_names,metric=0)
     
-    for i in clip_lim:
-        images[p] = utils.histogram_equalization_CLAHE(pos_images_names, tile_grid_size=(24,24), clip_limit=i)
-        utils.histograms_compare(images[p], pos_images_names, name=i)
-        p = p + 1
+    utils.ssim_compare(exact_hist_images,original_images,pos_images_names)
     
-    #pinakas me tis arxikew ikones
-    init_img = [cv.imread(x, 0) for x in pos_images_names]
-    
-    utils.ssim_compare(init_img, images, pos_images_names)
-    
-    CLAHE_images_final = images[0]   
     
     
     
     #save clahe images
-    for j in range(0,len(clip_lim)):
-        for i in range(0,len(pos_images_names)):
-            if not os.path.exists('images/'+pos_images_names[i][-64:-27]):
-                os.makedirs('images/'+pos_images_names[i][-64:-27])
-            cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/CLAHE_CLIP_LIM_'+str(clip_lim[j])+'.png',images[j][i]) 
+ #   for j in range(0,len(clip_lim)):
+  #      for i in range(0,len(pos_images_names)):
+  #          if not os.path.exists('images/'+pos_images_names[i][-64:-27]):
+  #              os.makedirs('images/'+pos_images_names[i][-64:-27])
+  #          cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/CLAHE_CLIP_LIM_'+str(clip_lim[j])+'.png',images[j][i]) 
         
     #save exact hist match
     
-    for i in range(0,len(pos_images_names)):
-                cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/EXACT_HIST.png',exact_matching_final[i]) 
+ #   for i in range(0,len(pos_images_names)):
+   #             cv.imwrite('images/'+pos_images_names[i][-64:-27]+'/EXACT_HIST.png',exact_matching_final[i]) 
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
