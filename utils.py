@@ -86,8 +86,6 @@ def mse_compare(image,images,image_names,text=''):
     image_names = [ i[35:56]  for i in image_names ]
     
     mat = []
-    
-    mat2 = []
    
     for i in range(len(image)):
         mat.append(mse(image[i],images[i]))
@@ -96,14 +94,13 @@ def mse_compare(image,images,image_names,text=''):
     plot = plt.bar(image_names,mat)
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
 
-    return mat
+    return sum(i < 1000 for i in mat)
+
 def ssim_compare(image,images,image_names,text=''):
     
     image_names = [ i[35:56]  for i in image_names ]
     
-    mat = []
-    
-    mat2 = []
+    mat = []  
    
     for i in range(len(image)):
         mat.append(ssim(image[i],images[i]))
@@ -112,7 +109,7 @@ def ssim_compare(image,images,image_names,text=''):
     plot = plt.bar(image_names,mat)
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
 
-    return mat
+    return sum(i > 0.5 for i in mat)
 
 def plot_histograms(images,images_name=''):
     
