@@ -122,7 +122,7 @@ def main():
 #    
 #    utils.mse_compare(hist_images,images,images_names)
    
-#papiline =========================================================================================================
+#pipeline =========================================================================================================
     
 #    clahe_images = utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=5,images_name=images_names)
 #    
