@@ -8,56 +8,8 @@ import os
 import glob
 
 def main():
-    ######################################################################################################
-    ######################################### PREPROCESS DATASET #########################################
-
-    # Every Image has 3 channels (pre-contrast, FLAIR, post-contrast) and one mask
-    # Import and Split the channels to different folders 
-    # It creates new images increasing time and resources consumption
-    utils.split_dataset(DATASET_PATH)
-
-    # Disable this for faster Debugging
-    utils.merge_slices_into_3D_image(DATASET_PATH, 'post-contrast')
-
-    # SINGLE POST CONTRAST IMAGE NIFTI - EXTRACTION
-    utils.convert_slice_to_nifti(DATASET_PATH, 'post-contrast')
-
-    # Disable this for faster Debugging
-    # utils.extract_brain(DATASET_PATH, 'post-contrast')
-
-    # Prepare dataset for pyradiomics extractor
-    # Getting the dataset's path, returns an object specifing for each patient the images and segmentations
-    # pre_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'pre-contrast')  # pre-contrast-3D
-    # flair_dataset = utils.get_dataset_as_object(DATASET_PATH, 'flair')
-    post_contrast_dataset = utils.get_dataset_as_object(DATASET_PATH, 'post-contrast')
-
-    # Get the filepaths from the images only (without the segmentations) as a list
-    # pre_contrast_images = [value['Image'] for value in pre_contrast_dataset.values()]
-    # flair_images = [value['Image'] for value in flair_dataset.values()]
-    post_contrast_images = [value['Image'] for value in post_contrast_dataset.values()]
-
-    ######################################################################################################
-    ##################################### EXTRACT RADIOMICS FEATURES #####################################
-
-    # Initialize PyRadiomics feature extractor wrapper
-    feature_extractor = FeatureExtractor(PARAMETERS_PATH)
-
-    # Execute batch processing to extract features
-    feature_extractor.extract_features(post_contrast_dataset, FEATURES_OUTPUT_PATH)
-
-    # ######################################################################################################
-    # ######################################### HISTOGRAM MATCHING #########################################
-
-    # Initialize HistogramMatcher & select histogram matching method
-    # histogram_matcher = HistogramMatcher(NEW_DATASET_OUTPUT_PATH, 'ExactHistogramMatching')
-
-    # Perform histogram matching
-    # histogram_matcher.match_histograms(flair_images[0], flair_images[1], display=True)
-
-    # Perform Batch histogram matching
-    # histogram_matcher.match_histograms(post_contrast_images, post_contrast_images[0], using_mask_extraction=True, display=True) # TODO: dataset[0] is temporal, should we automate reference image selection?
-    #exact histogram matching
-    
+     ######################################################################################################
+  
     #====  experiments ===========================================================================
     folders = os.listdir(DATASET_PATH)
     
@@ -71,68 +23,61 @@ def main():
     
     all_images = [pos_images_names, flair_images_names,pre_images_names]
     
+    
     #arxikes eikones 
     
-    images_names = all_images[0]
+    images_names = all_images[1] #epilogi kanalioy 
+    images = [ cv.imread(x, 0)  for x in images_names ]
     
-    images = [ cv.imread(x, 0)  for x in images_names]
+#    #ektiposi arxikon instogrammaton 
+#    
+  #  utils.plot_histograms(images,images_names)
+#    
+#    #sigrisi arxikon eikonon
+#    
+  #  print(utils.histograms_compare(images,images_names,metric=0))
     
-    #ektiposi arxikon instogrammaton 
-    
-    utils.plot_histograms(images,images_names)
-    
-    #sigrisi arxikon eikonon
-    utils.histograms_compare(images,images_names,metric=0)
-    
-    
+#
 #CLAHE ===========================================================================================================
-    
+#    
 #    clahe_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=5,images_name=images_names)
 #    
-#    utils.histograms_compare(clahe_images,images_names,metric=0)
+#    print(utils.histograms_compare(clahe_images,images_names,metric=0))
 #    
-#    utils.ssim_compare(clahe_images,images,images_names)
+#    print(utils.ssim_compare(clahe_images,images,images_names))
 #    
-#    utils.mse_compare(clahe_images,images,images_names)
-    
-    
-#histogram matching==========================================================================================
-    
-    #ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
-        
-#    hist_images = utils.histogram_matching(images,images[29] ,images_name=images_names)
-#    
-#    
-#    utils.histograms_compare(hist_images,images_names,metric=0)
-#    
-#    utils.ssim_compare(hist_images,images,images_names)
-#    
-#    utils.mse_compare(hist_images,images,images_names)
-    
-# exact histogram matching==========================================================================================
-    
-#    ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
-#        
-#    hist_images = utils.exact_histogram_matching(images,images[29] ,images_name=images_names)
-#    
-#    
-#    utils.histograms_compare(hist_images,images_names,metric=0)
-#    
-#    utils.ssim_compare(hist_images,images,images_names)
-#    
-#    utils.mse_compare(hist_images,images,images_names)
+#    print(utils.mse_compare(clahe_images,images,images_names))
    
+#histogram matching==========================================================================================
+#    
+#    ref_image = 'data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png'
+    
+
+#        
+#    utils.plot_histograms(images,images_names)
+#
+#    hist_images = utils.histogram_matching(images,images[3] ,images_name=images_names)
+#    
+#    print(utils.histograms_compare(hist_images,images_names,metric=0))
+#    print(utils.ssim_compare(hist_images,images,images_names))
+#    
+#    print(utils.mse_compare(hist_images,images,images_names))
+#    
+
 #pipeline =========================================================================================================
     
-#    clahe_images = utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=5,images_name=images_names)
+    ref_image = images[1]
+    hist_images = utils.histogram_matching(images, ref_image,images_name=images_names)
+
+    final_images = utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
+    
 #    
-#    final_images = utils.histogram_matching(clahe_images,clahe_images[29] ,images_name=images_names)
+#    print(utils.histograms_compare(clahe_images,images_names,metric=0))
 #    
-#    utils.histograms_compare(final_images,images_names,metric=0)
+#    print(utils.ssim_compare(clahe_images,images,images_names))
 #    
-#    utils.ssim_compare(final_images,images,images_names)
-#    
-#    utils.mse_compare(final_images,images,images_names)
+#    print(utils.mse_compare(clahe_images,images,images_names))
+    
 
 
     ######################################################################################################
