@@ -68,7 +68,7 @@ def histograms_compare(images,image_names,metric=0):
             text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
   
     
-    return mat
+    return np.average(mat)
 
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
@@ -100,11 +100,11 @@ def ssim_compare(image,images,image_names,text=''):
     
     image_names = [ i[35:56]  for i in image_names ]
     
-    mat = []  
+    mat = []
    
     for i in range(len(image)):
         mat.append(ssim(image[i],images[i]))
-        
+     
     plt.figure("ssim")
     plot = plt.bar(image_names,mat)
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
@@ -115,15 +115,17 @@ def plot_histograms(images,images_name=''):
     
     image_names = [ i[35:56]  for i in images_name ]
     
-    histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in images]
+    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]
 
     line =np.arange(0, 256)
-    
+    plt.figure(23)
+    plt.plot(histograms[1])
     plt.figure('original histograms images')
     for i in range(0,len(image_names)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
-        plt.plot(line,histograms[i],label=image_names[i])        
+        plt.plot(line,histograms[i],label=image_names[i])
+        plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
         plt.show()
     
     
@@ -132,6 +134,7 @@ def plot_histograms(images,images_name=''):
 
     for i in range(0,len(image_names)):
         plt.subplot(images_num,images_num, i+1),plt.imshow(images[i],'gray')
+        plt.title(image_names[i])
         plt.show()
    
     return 0
@@ -143,7 +146,7 @@ def histogram_equalization_CLAHE(images, number_bins=256, tile_grid_size=(32, 32
     
     clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
     
-    clahe_images = [clahe.apply(x) for x in images]
+    clahe_images = [clahe.apply(x.astype('uint8')) for x in images]
     
     histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
 
@@ -154,16 +157,18 @@ def histogram_equalization_CLAHE(images, number_bins=256, tile_grid_size=(32, 32
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=image_names[i])
+        plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
         plt.title("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size))
         
         plt.show()
     
     plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'img')
     
-    images_num = int(math.sqrt(len(image_names)))+1
+    images_num =  int(math.sqrt(len(image_names)))+1
     
     for i in range(0,len(image_names)):
         plt.subplot(images_num,images_num, i+1),plt.imshow(clahe_images[i],'gray')
+        plt.title(image_names[i])
         plt.show()
    
     return clahe_images
@@ -224,12 +229,15 @@ def histogram_matching(images, ref_img,images_name=''):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=images_name[i])
+        plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
         plt.show()
         
     images_num = int(math.sqrt(len(images)))+1
     plt.figure('histogram_matching imgs')
-    for i in range(0,len(images_name)):
+
+    for i in range(0,len(images)):
         plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
+        plt.title(images_name[i])
         plt.show()
  
     return exact_imgs
@@ -257,6 +265,7 @@ def exact_histogram_matching(images, ref_img,images_name=''):
         plt.show()
  
     return exact_imgs
+
 
 # Histogram Equalization Function
 # Reference: https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html
