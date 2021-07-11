@@ -15,7 +15,7 @@ from skimage.color import rgb2gray
 import math
 import pandas as pd
 from skimage.metrics import structural_similarity as ssim
-
+from histogram_matching import ExactHistogramMatcher
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
         # Get the image path, replace it with the image path from the old dataset
@@ -45,7 +45,7 @@ def histograms_compare(images,image_names,metric=0):
     for i in range(len(images)):
         for j in range(len(images)): 
             mat[i][j]=cv.compareHist(histograms[i],histograms[j],methods[metric])
-            
+        print
     fig,ax = plt.subplots()
     
     f = np.around(mat,2)
@@ -66,7 +66,7 @@ def histograms_compare(images,image_names,metric=0):
             
     val = np.triu(mat).ravel()
 
-    return np.average(len(val[val>0.001]))
+    return np.average(val[val>0.001])
 
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
@@ -120,15 +120,13 @@ def plot_histograms(images,images_name=''):
     histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]
 
     line =np.arange(0, 256)
-    plt.figure(23)
-    plt.plot(histograms[1])
     
     plt.figure('original histograms images')
     for i in range(0,len(image_names)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=image_names[i])
-        plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
+        #plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
         plt.show()
     
     images_num = int(math.sqrt(len(image_names)))+1
@@ -156,15 +154,16 @@ def histogram_equalization_CLAHE(images, number_bins=256, tile_grid_size=(32, 32
     line =np.arange(0, 256)
     
     plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'hist')
+    
     for i in range(0,len(image_names)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=image_names[i])
         plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
-        plt.title("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size))
+        plt.title("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size))      
+        plt.show()  
         
-        plt.show()
-    
+        
     plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'img')
     
     images_num =  int(math.sqrt(len(image_names)))+1
