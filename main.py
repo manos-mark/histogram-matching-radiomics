@@ -65,19 +65,19 @@ def main():
                  'data/dataset/TCGA_FG_A4MT_20020212/TCGA_FG_A4MT_20020212_5_pre-contrast.tif_removed_background.png']
 
     
-    ref_image = cv.imread(ref_image[channel])
+    ref_image = cv.imread(ref_image_name[channel])
     
   #  ref_image = images[1]
     
-    hist_images = utils.histogram_matching(images ,ref_image, 0),images_name=images_names)
+    hist_images = utils.histogram_matching(images ,ref_image,images_name=images_names)
     
-    utils.plot_histograms(hist_images,images_name='')
-    
-    print(utils.histograms_compare(hist_images,images_names,metric=0))
-    
-    print(utils.ssim_compare(hist_images,images,images_names))
-    
-    print(utils.mse_compare(hist_images,images,images_names))
+#    utils.plot_histograms(hist_images,images_name='')
+#    
+#    print(utils.histograms_compare(hist_images,images_names,metric=0))
+#    
+#    print(utils.ssim_compare(hist_images,images,images_names))
+#    
+#    print(utils.mse_compare(hist_images,images,images_names))
     
     final_images = utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
  
@@ -87,7 +87,6 @@ def main():
 ##    
 #    print(utils.mse_compare(final_images,images,images_names))
 ##    
-
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
     #####################################    FROM THE NEW DATASET    #####################################
