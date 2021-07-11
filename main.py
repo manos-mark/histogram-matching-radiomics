@@ -24,23 +24,14 @@ def main():
     
     all_images = [pos_images_names, flair_images_names,pre_images_names]
     
-
+  
     
-    channel = 0 #epilogi kanalioy
+    channel = 1 #epilogi kanalioy
     
-    images_names = all_images[channel] 
+    images_names = all_images[channel]
+   
+    images = [ cv.imread(x, 0)  for x in images_names ] 
     
-    images = [ cv.imread(x, 0)  for x in images_names ]
-    
-#    #ektiposi arxikon instogrammaton 
-#    
-    #utils.plot_histograms(images,images_names)
-#    
-#    #sigrisi arxikon eikonon
-#    
-#    print(utils.histograms_compare(images,images_names,metric=0))
-    
-#
 #CLAHE ===========================================================================================================
 #    
 #    clahe_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=5,images_name=images_names)
@@ -68,29 +59,34 @@ def main():
     
 
 #pipeline =========================================================================================================
-    
-    ref_image = ['data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png',
+
+    ref_image_name = ['data/dataset/TCGA_FG_5964_20010511/TCGA_FG_5964_20010511_5_post-contrast.tif_removed_background.png',
                  'data/dataset/TCGA_FG_6692_20020606/TCGA_FG_6692_20020606_4_flair.tif_removed_background.png',
                  'data/dataset/TCGA_FG_A4MT_20020212/TCGA_FG_A4MT_20020212_5_pre-contrast.tif_removed_background.png']
+
     
-                 
-    hist_images = utils.histogram_matching(images,cv.imread(ref_image[channel], 0) ,images_name=images_names)
+    ref_image = cv.imread(ref_image[channel])
+    
+  #  ref_image = images[1]
+    
+    hist_images = utils.histogram_matching(images ,ref_image, 0),images_name=images_names)
+    
+    utils.plot_histograms(hist_images,images_name='')
+    
+    print(utils.histograms_compare(hist_images,images_names,metric=0))
+    
+    print(utils.ssim_compare(hist_images,images,images_names))
+    
+    print(utils.mse_compare(hist_images,images,images_names))
     
     final_images = utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
-  
-    print(utils.histograms_compare(final_images,images_names,metric=0))
-    
-    print(utils.ssim_compare(final_images,images,images_names))
-    
-    print(utils.mse_compare(final_images,images,images_names))
-    
-
-  
-#    text = '/CLAHE_CLIP_5'
-#    for i in range(0,len(images)):
-#        if not os.path.exists('images/'+pos_images_names[i][-64:-27]):
-#            os.makedirs('images/'+pos_images_names[i][-64:-27])
-#            cv.imwrite('images/'+pos_images_names[i][-64:-27]+text+'.png',images[i]) 
+ 
+#    print(utils.histograms_compare(final_images,images_names,metric=0))
+##    
+#    print(utils.ssim_compare(final_images,images,images_names))
+##    
+#    print(utils.mse_compare(final_images,images,images_names))
+##    
 
     ######################################################################################################
     ##################################### EXTRACT RADIOMICS FEATURES #####################################
