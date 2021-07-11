@@ -15,7 +15,6 @@ from skimage.color import rgb2gray
 import math
 import pandas as pd
 from skimage.metrics import structural_similarity as ssim
-from histogram_matching import ExactHistogramMatcher
 
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
@@ -41,8 +40,6 @@ def histograms_compare(images,image_names,metric=0):
     
     mat = np.zeros((len(images),len(images)))
     
-    
-    
     methods = [cv.HISTCMP_BHATTACHARYYA ]
     
     for i in range(len(images)):
@@ -66,9 +63,10 @@ def histograms_compare(images,image_names,metric=0):
     for i in range(len(image_names)):
         for j in range(len(image_names)):
             text = ax.text(j, i, f[i, j], ha="center", va="center", color="w")
-  
-    
-    return np.average(mat)
+            
+    val = np.triu(mat).ravel()
+
+    return np.average(len(val[val>0.001]))
 
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
@@ -81,7 +79,8 @@ def mse(imageA, imageB):
     # the two images are
     return err
 
-def mse_compare(image,images,image_names,text=''):
+
+def mse_compare(image,images,image_names,lim=1000,text=''):
     
     image_names = [ i[35:56]  for i in image_names ]
     
@@ -94,9 +93,10 @@ def mse_compare(image,images,image_names,text=''):
     plot = plt.bar(image_names,mat)
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
 
-    return sum(i < 1000 for i in mat)
+    return sum(i < lim for i in mat)
 
-def ssim_compare(image,images,image_names,text=''):
+
+def ssim_compare(image,images,image_names,lim=0.5,text=''):
     
     image_names = [ i[35:56]  for i in image_names ]
     
@@ -106,10 +106,12 @@ def ssim_compare(image,images,image_names,text=''):
         mat.append(ssim(image[i],images[i]))
      
     plt.figure("ssim")
+    
     plot = plt.bar(image_names,mat)
+    
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
 
-    return sum(i > 0.5 for i in mat)
+    return sum(i > lim for i in mat)
 
 def plot_histograms(images,images_name=''):
     
@@ -120,6 +122,7 @@ def plot_histograms(images,images_name=''):
     line =np.arange(0, 256)
     plt.figure(23)
     plt.plot(histograms[1])
+    
     plt.figure('original histograms images')
     for i in range(0,len(image_names)):
         plt.xlim(0,255)
@@ -128,8 +131,8 @@ def plot_histograms(images,images_name=''):
         plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
         plt.show()
     
-    
     images_num = int(math.sqrt(len(image_names)))+1
+    
     plt.figure('original images')
 
     for i in range(0,len(image_names)):
@@ -198,10 +201,10 @@ def hist_match(source, template):
 
     # get the set of unique pixel values and their corresponding indices and
     # counts
-    s_values, bin_idx, s_counts = np.unique(source, return_inverse=True,
-                                            return_counts=True)
+    s_values, bin_idx, s_counts = np.unique(source, return_inverse=True, return_counts=True)
+    #print(sum(s_counts))
     t_values, t_counts = np.unique(template, return_counts=True)
-
+   # print(s_values)
     # take the cumsum of the counts and normalize by the number of pixels to
     # get the empirical cumulative distribution functions for the source and
     # template images (maps pixel value --> quantile)
@@ -216,55 +219,38 @@ def hist_match(source, template):
 
     return interp_t_values[bin_idx].reshape(oldshape)
 
+
+
+
 def histogram_matching(images, ref_img,images_name=''):
     
-    images_name = [ i[35:56]  for i in images_name ]
-    exact_imgs = [hist_match(i, ref_img) for i in images ]
- 
-    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
-    
-    line =np.arange(0, 256)
-    plt.figure('histogram_matching')
-    for i in range(0,len(images)):
-        plt.xlim(0,255)
-        plt.ylim(0, 5000)
-        plt.plot(line,histograms[i],label=images_name[i])
-        plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
-        plt.show()
-        
-    images_num = int(math.sqrt(len(images)))+1
-    plt.figure('histogram_matching imgs')
+     histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]     
+     
+     images_name = [ i[35:56]  for i in images_name ]
 
-    for i in range(0,len(images)):
-        plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
-        plt.title(images_name[i])
-        plt.show()
+   
+     exact_imgs = [hist_match(i,ref_img) for i in images ]
  
-    return exact_imgs
+     histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
 
-def exact_histogram_matching(images, ref_img,images_name=''):
-    
-    reference_histogram = ExactHistogramMatcher.get_histogram(ref_img)
-    
-    exact_imgs = [ExactHistogramMatcher.match_image_to_histogram(i, reference_histogram) for i in images ]
- 
-    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
-    
-    line =np.arange(0, 256)
-    plt.figure('1')
-    for i in range(0,len(images)):
-        plt.xlim(0,255)
-        plt.ylim(0, 5000)
-        plt.plot(line,histograms[i],label=images_name[i])
-        plt.show()
+     line =np.arange(0, 256)
+     plt.figure('histogram_matching')
+     for i in range(0,len(images)):
+         plt.xlim(0,255)
+         plt.ylim(0, 5000)
+         plt.plot(line,histograms[i],label=images_name[i])
+         plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
+         plt.show()
         
-    images_num = int(math.sqrt(len(images)))+1
-    plt.figure('2')
-    for i in range(0,len(images_name)):
-        plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
-        plt.show()
+     images_num = int(math.sqrt(len(images)))+1
+     plt.figure('histogram_matching imgs')
+
+     for i in range(0,len(images)):
+         plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
+         plt.title(images_name[i])
+         plt.show()
  
-    return exact_imgs
+     return exact_imgs
 
 
 # Histogram Equalization Function
