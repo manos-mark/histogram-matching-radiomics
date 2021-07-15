@@ -173,8 +173,10 @@ def plot_histograms(images,images_name='',text=''):
 def exact_histogram_matching(images, ref_img):
      exact_imgs = []
      
-     for i in images:
-         reference_histogram = ExactHistogramMatcher.get_histogram(hist_image_otsu(i))
+     
+     reference_histogram = ExactHistogramMatcher.get_histogram(ref_img)
+     
+     for i in images:        
          exact_imgs.append(ExactHistogramMatcher.match_image_to_histogram(i,reference_histogram))
  
      return exact_imgs
