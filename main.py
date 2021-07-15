@@ -40,7 +40,7 @@ def main():
     
 #CLAHE =========================================================================================================
     
-    final_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
+  #  final_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
     
     
 #=========================================================================================================================
