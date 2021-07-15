@@ -2,8 +2,6 @@ import os
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-import SimpleITK as sitk
-import imageio
 import skimage.io
 import napari
 import nibabel as nib
@@ -11,11 +9,11 @@ from pyrobex.robex import robex
 import glob
 import dicom2nifti
 from PIL import Image
-from skimage.color import rgb2gray
 import math
-import pandas as pd
 from skimage.metrics import structural_similarity as ssim
 from histogram_matching import ExactHistogramMatcher
+
+
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
         # Get the image path, replace it with the image path from the old dataset
@@ -68,6 +66,7 @@ def histograms_compare(images,image_names,metric=0):
 
     return np.average(val[val>0.001])
 
+
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
     # sum of the squared difference between the two images;
@@ -110,10 +109,49 @@ def ssim_compare(image,images,image_names,lim=0.5,text=''):
     plot = plt.bar(image_names,mat)
     
     plt.xticks(rotation=45, ha="right",rotation_mode="anchor")
-
+    
     return sum(i > lim for i in mat)
 
-def plot_histograms(images,images_name=''):
+def plot_image(images,images_name='',text='image'):
+    plt.figure(text)
+
+    plt.imshow(images,'gray')
+    plt.show()
+        
+    return 0 
+    
+
+def plot_images(images,images_name='',text=''):
+    
+    image_names = [ i[35:56]  for i in images_name ]
+    
+    images_num = int(math.sqrt(len(image_names)))+1
+    
+    plt.figure(text)
+
+    for i in range(0,len(images)):
+        plt.subplot(images_num,images_num, i+1),plt.imshow(images[i],'gray')
+        plt.title(image_names[i])
+        plt.show()
+        
+    return 0 
+    
+
+
+def plot_histogram(image,images_name='',text=''):
+
+    line =np.arange(0, 256)   
+    plt.figure(text)
+    plt.xlim(0,255)
+    plt.ylim(0, 5000)
+    plt.plot(line,cv.calcHist([image.astype('uint8')], [0], None, [256], [0, 256]),label=images_name)
+    plt.show()    
+   
+    return 0 
+    
+
+
+def plot_histograms(images,images_name='',text=''):
     
     image_names = [ i[35:56]  for i in images_name ]
     
@@ -121,59 +159,72 @@ def plot_histograms(images,images_name=''):
 
     line =np.arange(0, 256)
     
-    plt.figure('original histograms images')
-    for i in range(0,len(image_names)):
-        plt.xlim(0,255)
-        plt.ylim(0, 5000)
-        plt.plot(line,histograms[i],label=image_names[i])
-        #plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
-        plt.show()
-    
-    images_num = int(math.sqrt(len(image_names)))+1
-    
-    plt.figure('original images')
-
-    for i in range(0,len(image_names)):
-        plt.subplot(images_num,images_num, i+1),plt.imshow(images[i],'gray')
-        plt.title(image_names[i])
-        plt.show()
-   
-    return 0
-
-
-def histogram_equalization_CLAHE(images, number_bins=256, tile_grid_size=(32, 32), clip_limit=2.0,images_name=''):
-    
-    image_names = [ i[35:56]  for i in images_name ]
-    
-    clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-    
-    clahe_images = [clahe.apply(x.astype('uint8')) for x in images]
-    
-    histograms = [ cv.calcHist([x], [0], None, [256], [0, 256]) for x in clahe_images]
-
-    line =np.arange(0, 256)
-    
-    plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'hist')
-    
+    plt.figure(text)
     for i in range(0,len(image_names)):
         plt.xlim(0,255)
         plt.ylim(0, 5000)
         plt.plot(line,histograms[i],label=image_names[i])
         plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
-        plt.title("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size))      
-        plt.show()  
-        
-        
-    plt.figure("histograms with clahe clipLimit= "+str(clip_limit)+" tileGridSize ="+ str(tile_grid_size)+'img')
-    
-    images_num =  int(math.sqrt(len(image_names)))+1
-    
-    for i in range(0,len(image_names)):
-        plt.subplot(images_num,images_num, i+1),plt.imshow(clahe_images[i],'gray')
-        plt.title(image_names[i])
         plt.show()
+    
+   
+    return 0
+
+def exact_histogram_matching(images, ref_img):
+     exact_imgs = []
+     
+     for i in images:
+         reference_histogram = ExactHistogramMatcher.get_histogram(hist_image_otsu(i))
+         exact_imgs.append(ExactHistogramMatcher.match_image_to_histogram(i,reference_histogram))
+ 
+     return exact_imgs
+
+
+def histogram_equalization_CLAHE(images, tile_grid_size=(32, 32), clip_limit=2.0,images_name=''):
+    
+    
+    clahe = cv.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+    
+    clahe_images = [clahe.apply(x.astype('uint8')) for x in images]
+    
    
     return clahe_images
+
+def histogram_matching(images, ref_img,images_name=''):
+    
+     exact_imgs = [hist_match(i,ref_img) for i in images ]
+
+ 
+     return exact_imgs
+ 
+def avr_image(images):
+        
+    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]
+     
+    vrg = histograms[0]
+     
+    for i in histograms[1:]:
+        vrg+=i
+        
+    d = vrg/((len(images)))
+    print(len(d))
+      
+    d = [ int(d[i]) for i in range(0,len(d))]
+   
+    my_image = np.zeros(256*256)
+    
+    next_pix = 0 
+     
+   
+    for i in range(0,len(d)):
+        for j in range(0,d[i]):
+            my_image[next_pix+j] = i
+        next_pix = next_pix+d[i]
+    
+    w =  my_image.reshape((256, 256)).astype('uint8')  
+ 
+    return w
+
 
 def hist_match(source, template):
     """
@@ -218,38 +269,6 @@ def hist_match(source, template):
 
     return interp_t_values[bin_idx].reshape(oldshape)
 
-
-
-
-def histogram_matching(images, ref_img,images_name=''):
-    
-     histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]     
-     
-     images_name = [ i[35:56]  for i in images_name ]
-
-   
-     exact_imgs = [hist_match(i,ref_img) for i in images ]
- 
-     histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in exact_imgs]
-
-     line =np.arange(0, 256)
-     plt.figure('histogram_matching')
-     for i in range(0,len(images)):
-         plt.xlim(0,255)
-         plt.ylim(0, 5000)
-         plt.plot(line,histograms[i],label=images_name[i])
-         plt.legend(bbox_to_anchor=(.75, 1), borderaxespad=0.)
-         plt.show()
-        
-     images_num = int(math.sqrt(len(images)))+1
-     plt.figure('histogram_matching imgs')
-
-     for i in range(0,len(images)):
-         plt.subplot(images_num,images_num, i+1),plt.imshow(exact_imgs[i],'gray')
-         plt.title(images_name[i])
-         plt.show()
- 
-     return exact_imgs
 
 
 # Histogram Equalization Function
