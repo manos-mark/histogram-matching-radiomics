@@ -20,10 +20,12 @@ def main():
     pre_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*pre-contrast.tif_removed_background.png"))[0] for folder in folders]
     
     all_images = [pos_images_names, flair_images_names,pre_images_names]
+    
+    #epilogi kanalioy
        
     channel = 0
     
-    #epilogi kanalioy
+   
     
     images_names = all_images[channel]
    
