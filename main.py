@@ -58,10 +58,9 @@ def main():
 
 #pipeline  average_hist -> exact_hist matching ====================================================================
     
-#    average_hist_img  = utils.avr_image(images)
-#    
-#    final_images = utils.exact_histogram_matching(images,average_hist_img,images_name=images_names)
-#    
+    average_hist_img  = utils.avr_image(images)
+    
+    final_images = utils.exact_histogram_matching(images,average_hist_img)
 #=========================================================================================================================
   
 #  pipeline  histogram matching reference image -> clahe 10 ============================================================
