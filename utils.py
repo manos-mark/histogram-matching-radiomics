@@ -13,7 +13,6 @@ import math
 from skimage.metrics import structural_similarity as ssim
 from histogram_matching import ExactHistogramMatcher
 
-
 def insert_segmenetions_path_to_dict(dataset, new_dataset_output_path, dataset_path, contrast_type):
     for key, value in dataset.items():
         # Get the image path, replace it with the image path from the old dataset
@@ -199,33 +198,6 @@ def histogram_matching(images, ref_img,images_name=''):
  
      return exact_imgs
  
-def avr_image(images):
-        
-    histograms = [ cv.calcHist([x.astype('uint8')], [0], None, [256], [0, 256]) for x in images]
-     
-    vrg = histograms[0]
-     
-    for i in histograms[1:]:
-        vrg+=i
-        
-    d = vrg/((len(images)))
-    print(len(d))
-      
-    d = [ int(d[i]) for i in range(0,len(d))]
-   
-    my_image = np.zeros(256*256)
-    
-    next_pix = 0 
-     
-   
-    for i in range(0,len(d)):
-        for j in range(0,d[i]):
-            my_image[next_pix+j] = i
-        next_pix = next_pix+d[i]
-    
-    w =  my_image.reshape((256, 256)).astype('uint8')  
- 
-    return w
 
 
 def hist_match(source, template):
@@ -271,6 +243,73 @@ def hist_match(source, template):
 
     return interp_t_values[bin_idx].reshape(oldshape)
 
+
+def background_foreground_hist_img(background_pixel_num,start,length,all_pixel_num=256*256):
+    
+
+    
+    forground_pixel_num = all_pixel_num - background_pixel_num
+    
+    d = [ 0 for i in range(0,256)]
+    d[0] = background_pixel_num
+    
+    
+    pixel_num_for_single_bin_in_range_of_skull = int(forground_pixel_num/length)
+    
+    
+    for i in range(start,start+length):
+        d[i] = pixel_num_for_single_bin_in_range_of_skull
+    
+    image_arr = np.zeros(256*256)
+    
+    next_pix = 0 
+    
+    for i in range(0,len(d)):
+        for j in range(0,d[i]):
+           image_arr[next_pix+j] = i
+        next_pix = next_pix+d[i]
+        
+    final_image = image_arr.reshape((256, 256)).astype('uint8')
+    
+    return final_image
+
+def background_foreground_hist_img_otsu(image):
+    
+    ret2,th2 = cv.threshold(image,0,255,cv.THRESH_OTSU)
+    
+    width, height = image.shape
+    
+    all_pixel_num = width*height
+    background_pixel_num=sum(sum(th2==0))
+    forground_pixel_num = all_pixel_num - background_pixel_num
+    
+    
+    ln= 30
+    offset= 40
+     
+    
+    d = [ 0 for i in range(0,256)]
+    d[0] = background_pixel_num
+    
+    
+    pixel_num_for_single_bin_in_range_of_skull = int(forground_pixel_num/ln)
+    
+    for i in range(offset,ln+offset):
+        d[i] = pixel_num_for_single_bin_in_range_of_skull
+        
+    
+    image_arr = np.zeros(256*256)
+    
+    next_pix = 0 
+    
+    for i in range(0,len(d)):
+        for j in range(0,d[i]):
+           image_arr[next_pix+j] = i
+        next_pix = next_pix+d[i]
+        
+    final_image = image_arr.reshape((256, 256)).astype('uint8')
+    
+    return final_image
 
 
 # Histogram Equalization Function
