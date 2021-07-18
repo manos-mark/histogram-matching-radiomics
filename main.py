@@ -2,8 +2,6 @@ import cv2 as cv
 import utils
 import os
 import glob
-import matplotlib.pyplot as plt
-
 
 def main():
   
@@ -13,19 +11,15 @@ def main():
     
     #onomata arxikon eikonon 
     
-    pos_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*post-contrast.tif_removed_background.png"))[0] for folder in folders]
+    pos_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*post-contrast.tif"))[0] for folder in folders]
 
     flair_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*flair.tif_removed_background.png"))[0] for folder in folders]
     
     pre_images_names = [glob.glob(os.path.join(DATASET_PATH, folder, "*pre-contrast.tif_removed_background.png"))[0] for folder in folders]
     
     all_images = [pos_images_names, flair_images_names,pre_images_names]
-    
-    #epilogi kanalioy
        
     channel = 0
-    
-   
     
     images_names = all_images[channel]
    
@@ -33,16 +27,16 @@ def main():
     
     
     
-    utils.plot_histograms(images,images_names,text='original histograms ')
-    
-    print("original histogram distance :")
-    
-    print(utils.histograms_compare(images,images_names))
-    
+#    utils.plot_histograms(images,images_names,text='original histograms ')
+#    
+#    print("original histogram distance :")
+#    
+#    print(utils.histograms_compare(images,images_names))
+#    
     
 #CLAHE =========================================================================================================
     
-  #  final_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
+    #final_images =utils.histogram_equalization_CLAHE(images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
     
     
 #=========================================================================================================================
@@ -55,14 +49,7 @@ def main():
 #    ref_image = cv.imread(ref_image_name[channel],0)
 #    
 #    final_images = utils.histogram_matching(images,ref_image,images_name=images_names)
-   
-#=========================================================================================================================
 
-#pipeline  average_hist -> exact_hist matching ====================================================================
-    
-    average_hist_img  = utils.avr_image(images)
-    
-    final_images = utils.exact_histogram_matching(images,average_hist_img)
 #=========================================================================================================================
   
 #  pipeline  histogram matching reference image -> clahe 10 ============================================================
@@ -76,9 +63,18 @@ def main():
 #    hist_images = utils.histogram_matching(images,ref_image,images_name=images_names)
 #    
 #    final_images =utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
+    
 #=========================================================================================================================    
+#  pipeline  histogram matching made image -> clahe 10 ============================================================
  
- 
+    
+    hist_images = utils.histogram_matching(images,utils.background_foreground_hist_img(40_000,30,40),images_name=images_names)
+    
+    final_images =utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
+    
+#=========================================================================================================================    
+
+
     print("results ===========================")
     
     print("mean histogram  distance :")
@@ -93,7 +89,7 @@ def main():
     
     print(utils.mse_compare(final_images,images,images_names))
 #
-#   save image
+#   save images
 #    text = 'wh'
 #    
 #    for i in range(0,len(final_images)):
