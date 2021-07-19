@@ -65,7 +65,7 @@ def main():
 #    final_images =utils.histogram_equalization_CLAHE(hist_images,tile_grid_size=(24,24), clip_limit=10,images_name=images_names)
     
 #=========================================================================================================================    
-#  pipeline  histogram matching made image -> clahe 10 ============================================================
+#  pipeline  histogram matching alternative reference_2 -> clahe 10 ============================================================
  
     
     hist_images = utils.histogram_matching(images,utils.background_foreground_hist_img(40_000,30,40),images_name=images_names)
